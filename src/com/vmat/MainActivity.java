@@ -106,6 +106,8 @@ public class MainActivity extends Activity
             ViewHolder holder = (ViewHolder)row.getTag();
             try{
                 holder.topic.setText(items[position].getString("topic"));
+                holder.speaker.setText(items[position].getString("speaker_name"));
+                holder.date.setText(items[position].getString("date"));
             }catch(JSONException e){
                 e.printStackTrace();
             }

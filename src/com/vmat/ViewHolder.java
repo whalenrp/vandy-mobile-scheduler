@@ -12,9 +12,13 @@ import android.view.View;
  */
 public class ViewHolder {
     TextView topic = null;
+    TextView speaker = null;
+    TextView date = null;
 //    TextView speaker = null;
 //    TextView date = null;
     ViewHolder(View base){
         this.topic = (TextView)base.findViewById(R.id.topic);
+        this.speaker = (TextView)base.findViewById(R.id.speaker);
+        this.date = (TextView)base.findViewById(R.id.date);
     }
 }

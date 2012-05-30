@@ -11,7 +11,9 @@ public final class R {
     public static final class attr {
     }
     public static final class id {
+        public static final int date=0x7f040003;
         public static final int meetings=0x7f040000;
+        public static final int speaker=0x7f040002;
         public static final int topic=0x7f040001;
     }
     public static final class layout {
