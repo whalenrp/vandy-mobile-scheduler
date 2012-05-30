@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,14 +18,13 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 import java.util.NoSuchElementException;
 import android.util.Log;
 
 public class MainActivity extends Activity
 {
     private ListView listView;
-//    private JSON_Adapter items=null;
+    private JSONObject[] items;
 
 
     /** Called when the activity is first created. */
@@ -36,7 +34,6 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         listView = (ListView)findViewById(R.id.meetings);
-//        items = new JSON_Adapter();
         new JSON_Parse().execute();
     }
 
@@ -78,56 +75,49 @@ public class MainActivity extends Activity
         protected void onPostExecute(JSONArray jsonArray) {
             // For error checking
             Log.i(MainActivity.class.getName(), "Number of entries " + jsonArray.length());
-//            try{
-//
-//                for (int i=0; i < jsonArray.length(); ++i){
-//                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-//                    items.add(jsonObject);
-//                    Log.i(JSON_Parse.class.getName(), jsonObject.getString("text"));
-//                }
-//            }catch(Exception e){
-//                e.printStackTrace();
-//            }
-//            Log.i(MainActivity.class.getName(), "Number of items " + items.size());
-            String[] topics = new String[jsonArray.length()];
+            items = new JSONObject[jsonArray.length()];
             try{
                 for (int i=0; i< jsonArray.length(); ++i){
-                    topics[i] = jsonArray.getJSONObject(i).getString("topic");
+                    items[i] = jsonArray.getJSONObject(i);
                 }
             }catch(JSONException e){
                 e.printStackTrace();
             }
-            listView.setAdapter(new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, topics));
-//            listView.setAdapter(new JSON_Adapter());
+            listView.setAdapter(new JSON_Adapter());
+            Log.i(MainActivity.class.getName(), "Total number of list entries " + listView.getAdapter().getCount());
         }
 
     }
 
-//    class JSON_Adapter extends ArrayAdapter<JSONObject>{
-//        JSON_Adapter(){
-//            super(MainActivity.this, R.layout.rowlayout);
-//        }
-//
-//        @Override
-//        public View getView(int position, View convertView, ViewGroup parent){
-//            View row = convertView;
-////            ViewHolder holder = (ViewHolder)row.getTag();
-//            if (row == null){
-//                LayoutInflater inflater = getLayoutInflater();
-//                row = inflater.inflate(R.layout.rowlayout, parent, false);
-//                ViewHolder holder = new ViewHolder(row);
-//                row.setTag(holder);
-//            }
-//            ViewHolder holder = (ViewHolder)row.getTag();
-//            try{
-//                holder.topic.setText((String)items.get(position).get("topic"));
-//            }catch(JSONException e){
-//                e.printStackTrace();
-//            }
-//            return row;
-//        }
-//
-//    }
+    class JSON_Adapter extends ArrayAdapter<JSONObject>{
+        JSON_Adapter(){
+            super(MainActivity.this, R.layout.rowlayout);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent){
+            View row = convertView;
+            if (row == null){
+                LayoutInflater inflater = getLayoutInflater();
+                row = inflater.inflate(R.layout.rowlayout, parent, false);
+                ViewHolder holder = new ViewHolder(row);
+                row.setTag(holder);
+            }
+            ViewHolder holder = (ViewHolder)row.getTag();
+            try{
+                holder.topic.setText(items[position].getString("topic"));
+            }catch(JSONException e){
+                e.printStackTrace();
+            }
+            return row;
+        }
+
+        @Override
+        public int getCount(){
+            return items.length;
+        }
+
+    }
 
     // Helper function for reading input stream
     // retrieved from http://stackoverflow.com/a/5445161/793208
