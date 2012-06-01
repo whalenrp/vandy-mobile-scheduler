@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -14,8 +15,8 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
+import android.widget.SimpleCursorAdapter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,8 +33,8 @@ import android.util.Log;
 public class MainActivity extends Activity
 {
     private ListView listView;
-    private JSONObject[] items;
-    private Context myContext;
+    private Cursor meetingList;
+    private EventsDB db;
 
     /** Called when the activity is first created. */
     @Override
@@ -42,45 +43,38 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         listView = (ListView)findViewById(R.id.meetings);
+        db = new EventsDB(this);
+        meetingList = db.getReadableDatabase().rawQuery("SELECT * FROM meetings", null);
         new JSON_Parse().execute();
-        final Context myContext = this;
+
         listView.setOnItemClickListener(new OnItemClickListener() {
             @Override
         	public void onItemClick(AdapterView<?> parent, View view,
                 int position, long id) {
-              // When clicked, show a toast with the TextView text
-   /*           try {
-				//Toast.makeText(getApplicationContext(), items[position].getString("topic"),
-				//      Toast.LENGTH_SHORT).show();
-				AlertDialog.Builder builder = new AlertDialog.Builder(myContext);
-				builder.setMessage("Topic:\t" + items[position].getString("topic") + 
-								   "\nSpeaker:\t" + items[position].getString("speaker_name")+
-								   "\nDate:\t" + items[position].getString("date")+
-								   "\nFood:\t" + items[position].getString("food"));
-				builder.setNegativeButton("Return to List", new DialogInterface.OnClickListener() {
-						   public void onClick(DialogInterface dialog, int id) {
-							   dialog.cancel();
-						   }
-					   });
-				AlertDialog alert = builder.create();
-				alert.show();
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-            }*/
             	Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-                startActivity(intent);      
+
+                Cursor tempCursor = ((SimpleCursorAdapter)listView.getAdapter()).getCursor();
+                tempCursor.moveToPosition(position);
+                intent.putExtra("id", tempCursor.getInt(tempCursor.getColumnIndex("_id")));
+                startActivity(intent);
+//                Log.i(MainActivity.class.getName(), "Outputting column names");
+//                for (int i=0; i< meetingList.get)
+
                 finish();
             }
           });
+
+
+        listView.setAdapter(new SimpleCursorAdapter(this, R.layout.rowlayout, meetingList,
+                new String[]{EventsDB.TOPIC, EventsDB.SPEAKER_NAME, EventsDB.DATE},
+                new int[]{R.id.topic, R.id.speaker, R.id.date}));
         
     }
 
-    class JSON_Parse extends AsyncTask<Void, Void, JSONArray>{
+    class JSON_Parse extends AsyncTask<Void, Void, Void>{
 
         @Override
-        protected JSONArray doInBackground(Void... unsused){
+        protected Void doInBackground(Void... unsused){
             String jsonString = "";
             try{
                 URL url = new URL("http://70.138.50.84/meetings.json");
@@ -108,58 +102,76 @@ public class MainActivity extends Activity
                 e.printStackTrace();
             }
 
-            return (jsonArray);
-        }
 
-        @Override
-        protected void onPostExecute(JSONArray jsonArray) {
-            // For error checking
-            Log.i(MainActivity.class.getName(), "Number of entries " + jsonArray.length());
-            items = new JSONObject[jsonArray.length()];
             try{
                 for (int i=0; i< jsonArray.length(); ++i){
-                    items[i] = jsonArray.getJSONObject(i);
+                    JSONObject object =  jsonArray.getJSONObject(i);
+                    db.insert(object.getString("created_at"),object.getString("date"),
+                            object.getString("day"), object.getString("description"),
+                            object.getBoolean("food"), object.getBoolean("speaker"),
+                            object.getString("speaker_name"), object.getString("topic"),
+                            object.getString("updated_at"), object.getDouble("xcoordinate"),
+                            object.getDouble("ycoordinate"));
+
                 }
             }catch(JSONException e){
                 e.printStackTrace();
             }
-            listView.setAdapter(new JSON_Adapter());
-            Log.i(MainActivity.class.getName(), "Total number of list entries " + listView.getAdapter().getCount());
+
+//            return (jsonArray);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void nothing) {
+            // For error checking
+//            Log.i(MainActivity.class.getName(), "Number of entries " + jsonArray.length());
+//            items = new JSONObject[jsonArray.length()];
+//            try{
+//                for (int i=0; i< jsonArray.length(); ++i){
+//                    items[i] = jsonArray.getJSONObject(i);
+//                }
+//            }catch(JSONException e){
+//                e.printStackTrace();
+//            }
+//            listView.setAdapter(new JSON_Adapter());
+//            Log.i(MainActivity.class.getName(), "Total number of list entries " + listView.getAdapter().getCount());
+              meetingList = db.getReadableDatabase().rawQuery("SELECT * FROM meetings", null);
         }
 
     }
 
-    class JSON_Adapter extends ArrayAdapter<JSONObject>{
-        JSON_Adapter(){
-            super(MainActivity.this, R.layout.rowlayout);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent){
-            View row = convertView;
-            if (row == null){
-                LayoutInflater inflater = getLayoutInflater();
-                row = inflater.inflate(R.layout.rowlayout, parent, false);
-                ViewHolder holder = new ViewHolder(row);
-                row.setTag(holder);
-            }
-            ViewHolder holder = (ViewHolder)row.getTag();
-            try{
-                holder.topic.setText(items[position].getString("topic"));
-                holder.speaker.setText(items[position].getString("speaker_name"));
-                holder.date.setText(items[position].getString("date"));
-            }catch(JSONException e){
-                e.printStackTrace();
-            }
-            return row;
-        }
-
-        @Override
-        public int getCount(){
-            return items.length;
-        }
-
-    }
+//    class JSON_Adapter extends ArrayAdapter<JSONObject>{
+//        JSON_Adapter(){
+//            super(MainActivity.this, R.layout.rowlayout);
+//        }
+//
+//        @Override
+//        public View getView(int position, View convertView, ViewGroup parent){
+//            View row = convertView;
+//            if (row == null){
+//                LayoutInflater inflater = getLayoutInflater();
+//                row = inflater.inflate(R.layout.rowlayout, parent, false);
+//                ViewHolder holder = new ViewHolder(row);
+//                row.setTag(holder);
+//            }
+//            ViewHolder holder = (ViewHolder)row.getTag();
+//            try{
+//                holder.topic.setText(items[position].getString("topic"));
+//                holder.speaker.setText(items[position].getString("speaker_name"));
+//                holder.date.setText(items[position].getString("date"));
+//            }catch(JSONException e){
+//                e.printStackTrace();
+//            }
+//            return row;
+//        }
+//
+//        @Override
+//        public int getCount(){
+//            return items.length;
+//        }
+//
+//    }
 
     // Helper function for reading input stream
     // retrieved from http://stackoverflow.com/a/5445161/793208
