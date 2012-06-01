@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.EditText;
-import apt.tuturials.R;
 
 public class DetailActivity extends Activity{
 	private EventsDB hasDataBase; 
@@ -13,7 +12,10 @@ public class DetailActivity extends Activity{
 	private Cursor myInformation;
 	private String[] colNames;
 	
+	@Override
 	public void onCreate(Bundle savedInstantState){
+		super.onCreate(savedInstantState);
+        setContentView(R.layout.DetailActivity);
 		hasDataBase = new EventsDB(this);
 		myDataBase = hasDataBase.getReadableDatabase();
 		String[] index = new String[1];
@@ -50,7 +52,9 @@ public class DetailActivity extends Activity{
 		}
 		return -1;
 	}
+	@Override
 	public void onDestroy(){
+		super.onDestroy();
 		hasDataBase.close();
 	}
 }
