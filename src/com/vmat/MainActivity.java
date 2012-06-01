@@ -1,9 +1,6 @@
 package com.vmat;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -13,7 +10,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,7 +28,7 @@ public class MainActivity extends Activity
 {
     private ListView listView;
     private JSONObject[] items;
-    private Context myContext;
+    private EventsDB db;
 
     /** Called when the activity is first created. */
     @Override
@@ -41,37 +37,14 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         listView = (ListView)findViewById(R.id.meetings);
+        db = new EventsDB(this);
         new JSON_Parse().execute();
-        final Context myContext = this;
         listView.setOnItemClickListener(new OnItemClickListener() {
             @Override
         	public void onItemClick(AdapterView<?> parent, View view,
                 int position, long id) {
               // When clicked, show a toast with the TextView text
-              try {
-				//Toast.makeText(getApplicationContext(), items[position].getString("topic"),
-				//      Toast.LENGTH_SHORT).show();
-				
 
-				AlertDialog.Builder builder = new AlertDialog.Builder(myContext);
-				builder.setMessage("Topic:\t" + items[position].getString("topic") + 
-								   "\nSpeaker:\t" + items[position].getString("speaker_name")+
-								   "\nDate:\t" + items[position].getString("date")+
-								   "\nFood:\t" + items[position].getString("food"));
-				builder.setNegativeButton("Return to List", new DialogInterface.OnClickListener() {
-						   public void onClick(DialogInterface dialog, int id) {
-							   dialog.cancel();
-						   }
-					   });
-				      
-				AlertDialog alert = builder.create();
-				alert.show();
-				
-				
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
             }
           });
         
@@ -105,6 +78,22 @@ public class MainActivity extends Activity
                 // Do something more intelligent here..
                 // This is hit when the connection is established, but there is no data
                 // on the page.
+                e.printStackTrace();
+            }
+
+
+            try{
+                for (int i=0; i< jsonArray.length(); ++i){
+                    JSONObject object =  jsonArray.getJSONObject(i);
+                    db.insert(object.getString("created_at"),object.getString("date"),
+                            object.getString("day"), object.getString("description"),
+                            object.getBoolean("food"), object.getBoolean("speaker"),
+                            object.getString("speaker_name"), object.getString("topic"),
+                            object.getString("updated_at"), object.getDouble("xcoordinate"),
+                            object.getDouble("ycoordinate"));
+
+                }
+            }catch(JSONException e){
                 e.printStackTrace();
             }
 
