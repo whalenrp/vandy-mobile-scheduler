@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -48,11 +49,9 @@ public class MainActivity extends Activity
         	public void onItemClick(AdapterView<?> parent, View view,
                 int position, long id) {
               // When clicked, show a toast with the TextView text
-              try {
+   /*           try {
 				//Toast.makeText(getApplicationContext(), items[position].getString("topic"),
 				//      Toast.LENGTH_SHORT).show();
-				
-
 				AlertDialog.Builder builder = new AlertDialog.Builder(myContext);
 				builder.setMessage("Topic:\t" + items[position].getString("topic") + 
 								   "\nSpeaker:\t" + items[position].getString("speaker_name")+
@@ -63,15 +62,16 @@ public class MainActivity extends Activity
 							   dialog.cancel();
 						   }
 					   });
-				      
 				AlertDialog alert = builder.create();
 				alert.show();
-				
-				
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+            }*/
+            	Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                startActivity(intent);      
+                finish();
             }
           });
         
