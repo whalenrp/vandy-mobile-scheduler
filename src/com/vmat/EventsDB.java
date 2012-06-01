@@ -15,6 +15,17 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class EventsDB extends SQLiteOpenHelper {
     private static final  String DATABASE_NAME="mobile_meetups.db";
     private static final int SCHEMA_VERSION=1;
+    static final String CREATED_AT = "created_at";
+    static final String DATE = "date";
+    static final String DAY = "day";
+    static final String DESCRIPTION = "description";
+    static final String FOOD = "food";
+    static final String SPEAKER = "speaker";
+    static final String SPEAKER_NAME = "speaker_name";
+    static final String TOPIC = "topic";
+    static final String UPDATED_AT = "updated_at";
+    static final String XCOORD = "xcoordinate";
+    static final String YCOORD = "ycoordinate";
 
     public EventsDB(Context context){
         super(context, DATABASE_NAME, null, SCHEMA_VERSION);
@@ -39,17 +50,17 @@ public class EventsDB extends SQLiteOpenHelper {
                        double xcoordinate, double ycoordinate)
     {
         ContentValues cv = new ContentValues();
-        cv.put("created_at", created_at);
-        cv.put("date", date);
-        cv.put("day", day);
-        cv.put("description", description);
-        cv.put("food", food);
-        cv.put("speaker", speaker);
-        cv.put("speaker_name", speaker_name);
-        cv.put("topic", topic);
-        cv.put("updated_at", updated_at);
-        cv.put("xcoordinate", xcoordinate);
-        cv.put("ycoordinate", ycoordinate);
+        cv.put(CREATED_AT, created_at);
+        cv.put(DATE, date);
+        cv.put(DAY, day);
+        cv.put(DESCRIPTION, description);
+        cv.put(FOOD, food);
+        cv.put(SPEAKER, speaker);
+        cv.put(SPEAKER_NAME, speaker_name);
+        cv.put(TOPIC, topic);
+        cv.put(UPDATED_AT, updated_at);
+        cv.put(XCOORD, xcoordinate);
+        cv.put(YCOORD, ycoordinate);
         getWritableDatabase().insert("meetings", null, cv);
 
     }
