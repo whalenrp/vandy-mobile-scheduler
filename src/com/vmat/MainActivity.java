@@ -70,6 +70,14 @@ public class MainActivity extends Activity
                 new int[]{R.id.topic, R.id.speaker, R.id.date}));
         
     }
+    
+    @Override
+    public void onPause(){
+    	super.onPause();
+    	meetingList.close();
+    }
+    
+
 
     class JSON_Parse extends AsyncTask<Void, Void, Void>{
 
@@ -137,7 +145,8 @@ public class MainActivity extends Activity
 //            listView.setAdapter(new JSON_Adapter());
 //            Log.i(MainActivity.class.getName(), "Total number of list entries " + listView.getAdapter().getCount());
               meetingList = db.getReadableDatabase().rawQuery("SELECT * FROM meetings", null);
-        }
+          	db.close();
+         }
 
     }
 
