@@ -57,18 +57,23 @@ public class MainActivity extends Activity
                 tempCursor.moveToPosition(position);
                 intent.putExtra("id", tempCursor.getInt(tempCursor.getColumnIndex("_id")));
                 startActivity(intent);
-//                Log.i(MainActivity.class.getName(), "Outputting column names");
-//                for (int i=0; i< meetingList.get)
 
                 finish();
             }
           });
 
 
+        // Update this to use the LoadManager
         listView.setAdapter(new SimpleCursorAdapter(this, R.layout.rowlayout, meetingList,
                 new String[]{EventsDB.TOPIC, EventsDB.SPEAKER_NAME, EventsDB.DATE},
                 new int[]{R.id.topic, R.id.speaker, R.id.date}));
         
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onPause();
+        meetingList.close();
     }
 
     class JSON_Parse extends AsyncTask<Void, Void, Void>{
@@ -106,37 +111,29 @@ public class MainActivity extends Activity
             try{
                 for (int i=0; i< jsonArray.length(); ++i){
                     JSONObject object =  jsonArray.getJSONObject(i);
+
+                    // Compare latest updated Timestamp to latest timestamp in db.
+                    // if different, delete local db and build table again.
                     db.insert(object.getString("created_at"),object.getString("date"),
                             object.getString("day"), object.getString("description"),
                             object.getBoolean("food"), object.getBoolean("speaker"),
                             object.getString("speaker_name"), object.getString("topic"),
                             object.getString("updated_at"), object.getDouble("xcoordinate"),
-                            object.getDouble("ycoordinate"));
+                            object.getDouble("ycoordinate"), object.getInt("id"));
 
                 }
             }catch(JSONException e){
                 e.printStackTrace();
             }
 
-//            return (jsonArray);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void nothing) {
-            // For error checking
-//            Log.i(MainActivity.class.getName(), "Number of entries " + jsonArray.length());
-//            items = new JSONObject[jsonArray.length()];
-//            try{
-//                for (int i=0; i< jsonArray.length(); ++i){
-//                    items[i] = jsonArray.getJSONObject(i);
-//                }
-//            }catch(JSONException e){
-//                e.printStackTrace();
-//            }
-//            listView.setAdapter(new JSON_Adapter());
-//            Log.i(MainActivity.class.getName(), "Total number of list entries " + listView.getAdapter().getCount());
-              meetingList = db.getReadableDatabase().rawQuery("SELECT * FROM meetings", null);
+            // In the UI thread, make a new cursor with the updated db entries.
+            meetingList = db.getReadableDatabase().rawQuery("SELECT * FROM meetings", null);
+            db.close();
         }
 
     }

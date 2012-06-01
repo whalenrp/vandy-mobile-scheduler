@@ -26,6 +26,7 @@ public class EventsDB extends SQLiteOpenHelper {
     static final String UPDATED_AT = "updated_at";
     static final String XCOORD = "xcoordinate";
     static final String YCOORD = "ycoordinate";
+    static final String ID = "id";
 
     public EventsDB(Context context){
         super(context, DATABASE_NAME, null, SCHEMA_VERSION);
@@ -47,7 +48,7 @@ public class EventsDB extends SQLiteOpenHelper {
     public void insert(String created_at, String date, String day,
                        String description, boolean food, boolean speaker,
                        String speaker_name, String topic, String updated_at,
-                       double xcoordinate, double ycoordinate)
+                       double xcoordinate, double ycoordinate, int id)
     {
         ContentValues cv = new ContentValues();
         cv.put(CREATED_AT, created_at);
@@ -61,6 +62,7 @@ public class EventsDB extends SQLiteOpenHelper {
         cv.put(UPDATED_AT, updated_at);
         cv.put(XCOORD, xcoordinate);
         cv.put(YCOORD, ycoordinate);
+        cv.put(ID, id);
         getWritableDatabase().insert("meetings", null, cv);
 
     }
