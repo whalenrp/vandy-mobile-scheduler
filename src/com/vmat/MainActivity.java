@@ -69,6 +69,14 @@ public class MainActivity extends Activity
                 new int[]{R.id.topic, R.id.speaker, R.id.date}));
         
     }
+    
+    @Override
+    public void onPause(){
+    	super.onPause();
+    	meetingList.close();
+    }
+    
+
 
     @Override
     public void onDestroy(){
@@ -134,7 +142,7 @@ public class MainActivity extends Activity
             // In the UI thread, make a new cursor with the updated db entries.
             meetingList = db.getReadableDatabase().rawQuery("SELECT * FROM meetings", null);
             db.close();
-        }
+         }
 
     }
 
