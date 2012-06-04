@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.EditText;
 import android.widget.TextView;
 
 public class DetailActivity extends Activity{
@@ -21,22 +19,16 @@ public class DetailActivity extends Activity{
         setContentView(R.layout.detail_activity);
 		hasDataBase = new EventsDB(this);
 		myDataBase = hasDataBase.getReadableDatabase();
-		//String[] index = new String[1];
-		//index[0] = "" + getIntent().getIntExtra("id", 1);
-		//Log.i(DetailActivity.class.getName(), getIntent().getStringExtra("id"));
+		String[] index = new String[1];
+		index[0] = "" + getIntent().getIntExtra("id", -1);
 
-		myInformation = myDataBase.rawQuery("SELECT * FROM meetings WHERE _id=? LIMIT 1", getIntent().getStringArrayExtra("id"));
-		if(myInformation.moveToFirst()){
-			Log.i(DetailActivity.class.getName(), "I am here");
-		}
+		myInformation = myDataBase.rawQuery("SELECT * FROM meetings WHERE _id=? LIMIT 1", index);
 		colNames = myInformation.getColumnNames();
 		int topicNum = search(colNames,"topic");
 		TextView topic=(TextView)findViewById(R.id.topic);
 		topic.setText(myInformation.getString(topicNum));
 		TextView details=(TextView)findViewById(R.id.details);
 		details.setText(getText(details));
-		//myInformation = myDataBase.rawQuery("SELECT * FROM meetings", null);
-		Log.i(DetailActivity.class.getName(), getIntent().getStringArrayExtra("id")[0]);
 	}
 	
 	
@@ -46,7 +38,6 @@ public class DetailActivity extends Activity{
 		String information = "";
 		information += myInformation.getString(search(colNames, "speaker_name")) + "\n";
 		information += myInformation.getString(search(colNames, "date")) + "\n";
-	//	information += myInformation.getString(search(colNames, "location")) + "\n";
 		information += myInformation.getString(search(colNames, "food")) + "\n";
 		return information;
 	}
