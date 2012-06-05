@@ -1,0 +1,10 @@
+<resources>
+    <style name="CustomTitleBackground">
+        <item name="android:background">@color/headerColor</item>
+    </style>
+    <style name="LargeTitleTheme">
+        <item name="android:windowTitleSize">45dip</item>
+        <item name="android:windowTitleBackgroundStyle">@style/CustomTitleBackground</item>
+
+    </style>
+</resources>

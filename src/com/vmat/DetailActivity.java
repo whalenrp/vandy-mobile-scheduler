@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.Window;
 import android.widget.TextView;
 
 public class DetailActivity extends Activity{
@@ -16,7 +17,9 @@ public class DetailActivity extends Activity{
     @Override
 	public void onCreate(Bundle savedInstantState){
         super.onCreate(savedInstantState);
+        requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
         setContentView(R.layout.detail_activity);
+        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.headerlayout);
 		hasDataBase = new EventsDB(this);
 		myDataBase = hasDataBase.getReadableDatabase();
 		String[] index = new String[1];
