@@ -23,6 +23,7 @@ public class DetailActivity extends Activity{
 		index[0] = "" + getIntent().getIntExtra("id", -1);
 
 		myInformation = myDataBase.rawQuery("SELECT * FROM meetings WHERE _id=? LIMIT 1", index);
+        myInformation.moveToFirst();
 		colNames = myInformation.getColumnNames();
 		int topicNum = search(colNames,"topic");
 		TextView topic=(TextView)findViewById(R.id.topic);

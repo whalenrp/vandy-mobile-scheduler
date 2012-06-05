@@ -1,9 +1,7 @@
 package com.vmat;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -13,22 +11,17 @@ import android.view.ViewGroup;
 import android.view.LayoutInflater;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.CursorAdapter;
 
 import android.widget.SimpleCursorAdapter;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.NoSuchElementException;
-import android.util.Log;
+import android.text.format.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+
 
 public class MainActivity extends Activity
 {
@@ -62,19 +55,15 @@ public class MainActivity extends Activity
             }
           });
 
-
-        // Update this to use the LoadManager
-        listView.setAdapter(new SimpleCursorAdapter(this, R.layout.rowlayout, meetingList,
-                new String[]{EventsDB.TOPIC, EventsDB.SPEAKER_NAME, EventsDB.DATE},
-                new int[]{R.id.topic, R.id.speaker, R.id.date}));
+        listView.setAdapter(new EventsCursorAdapter());
         
     }
     
-    @Override
-    public void onPause(){
-    	super.onPause();
-    	meetingList.close();
-    }
+//    @Override
+//    public void onPause(){
+//    	super.onPause();
+//    	meetingList.close();
+//    }
     
 
 
@@ -84,107 +73,61 @@ public class MainActivity extends Activity
         meetingList.close();
     }
 
-    class JSON_Parse extends AsyncTask<Void, Void, Void>{
+    class JSON_Parse extends AsyncTask<Void, Void, Cursor>{
 
         @Override
-        protected Void doInBackground(Void... unsused){
-            String jsonString = "";
-            try{
-                URL url = new URL("http://70.138.50.84/meetings.json");
-                HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
-                try{
-                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-                    jsonString = convertStreamToString(in);
-                }finally{
-                    urlConnection.disconnect();
-                }
-            }catch(MalformedURLException e){
-                // Make a toast saying the site has moved?
-                e.printStackTrace();
-            }catch(IOException e){
-                e.printStackTrace();
-            }
-            JSONArray jsonArray = null;
-            try{
-                jsonArray = new JSONArray(jsonString);
-
-            }catch(JSONException e){
-                // Do something more intelligent here..
-                // This is hit when the connection is established, but there is no data
-                // on the page.
-                e.printStackTrace();
-            }
-
-
-            try{
-                for (int i=0; i< jsonArray.length(); ++i){
-                    JSONObject object =  jsonArray.getJSONObject(i);
-
-                    // Compare latest updated Timestamp to latest timestamp in db.
-                    // if different, delete local db and build table again.
-                    db.insert(object.getString("created_at"),object.getString("date"),
-                            object.getString("day"), object.getString("description"),
-                            object.getBoolean("food"), object.getBoolean("speaker"),
-                            object.getString("speaker_name"), object.getString("topic"),
-                            object.getString("updated_at"), object.getDouble("xcoordinate"),
-                            object.getDouble("ycoordinate"), object.getInt("id"));
-
-                }
-            }catch(JSONException e){
-                e.printStackTrace();
-            }
-
-            return null;
+        protected Cursor doInBackground(Void... unsused){
+            Cursor newCursor = db.refreshDB();
+            return newCursor;
         }
 
         @Override
-        protected void onPostExecute(Void nothing) {
+        protected void onPostExecute(Cursor cursor) {
             // In the UI thread, make a new cursor with the updated db entries.
-            meetingList = db.getReadableDatabase().rawQuery("SELECT * FROM meetings", null);
+            meetingList.close();
+            meetingList = cursor;
+            listView.setAdapter(new EventsCursorAdapter());
             db.close();
          }
 
     }
 
-//    class JSON_Adapter extends ArrayAdapter<JSONObject>{
-//        JSON_Adapter(){
-//            super(MainActivity.this, R.layout.rowlayout);
-//        }
-//
-//        @Override
-//        public View getView(int position, View convertView, ViewGroup parent){
-//            View row = convertView;
-//            if (row == null){
-//                LayoutInflater inflater = getLayoutInflater();
-//                row = inflater.inflate(R.layout.rowlayout, parent, false);
-//                ViewHolder holder = new ViewHolder(row);
-//                row.setTag(holder);
-//            }
-//            ViewHolder holder = (ViewHolder)row.getTag();
-//            try{
-//                holder.topic.setText(items[position].getString("topic"));
-//                holder.speaker.setText(items[position].getString("speaker_name"));
-//                holder.date.setText(items[position].getString("date"));
-//            }catch(JSONException e){
-//                e.printStackTrace();
-//            }
-//            return row;
-//        }
-//
-//        @Override
-//        public int getCount(){
-//            return items.length;
-//        }
-//
-//    }
-
-    // Helper function for reading input stream
-    // retrieved from http://stackoverflow.com/a/5445161/793208
-    private String convertStreamToString(InputStream is){
-        try{
-            return new java.util.Scanner(is).useDelimiter("\\A").next();
-        }catch(NoSuchElementException e){
-            return "";
+    class EventsCursorAdapter extends CursorAdapter{
+        EventsCursorAdapter(){
+            super(MainActivity.this, meetingList, false);
         }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent){
+
+            LayoutInflater inflater = getLayoutInflater();
+            View row = inflater.inflate(R.layout.rowlayout, parent, false);
+            ViewHolder holder = new ViewHolder(row);
+            row.setTag(holder);
+            return row;
+        }
+
+        @Override
+        public void bindView(View row, Context context, Cursor cursor){
+            ViewHolder holder = (ViewHolder)row.getTag();
+            holder.topic.setText(
+                    cursor.getString(cursor.getColumnIndex(EventsDB.TOPIC)));
+            holder.speaker.setText(
+                    cursor.getString(cursor.getColumnIndex(EventsDB.SPEAKER_NAME)));
+
+            // Format the date
+            String UTCdate = cursor.getString(cursor.getColumnIndex(EventsDB.DATE));
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            Date parsed = new Date();
+            try{
+                parsed = format.parse(UTCdate);
+            }catch(ParseException e){
+                e.printStackTrace();
+            }
+
+            holder.date.setText(DateFormat.format("EEEE, MMMM d '@' h:mm a", parsed));
+//            holder.date.setText(SimpleDateFormat("E, L dd '@' hh:mm a",));
+        }
+
     }
 }
