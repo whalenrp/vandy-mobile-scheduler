@@ -20,7 +20,7 @@ import android.text.format.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class MainActivity extends Activity
@@ -28,6 +28,7 @@ public class MainActivity extends Activity
     private ListView listView;
     private Cursor meetingList;
     private EventsDB db;
+    private JSON_Parse background;
 
     /** Called when the activity is first created. */
     @Override
@@ -37,8 +38,10 @@ public class MainActivity extends Activity
         setContentView(R.layout.main);
         listView = (ListView)findViewById(R.id.meetings);
         db = new EventsDB(this);
-        meetingList = db.getReadableDatabase().rawQuery("SELECT * FROM meetings", null);
-        new JSON_Parse().execute();
+        meetingList = db.getReadableDatabase().rawQuery("SELECT * FROM " +
+                EventsDB.TABLE_NAME + " ORDER BY " + EventsDB.DATE, null);
+        background = new JSON_Parse();
+        background.execute();
 
         listView.setOnItemClickListener(new OnItemClickListener() {
             @Override
@@ -58,26 +61,26 @@ public class MainActivity extends Activity
         listView.setAdapter(new EventsCursorAdapter());
         
     }
-    
-//    @Override
-//    public void onPause(){
-//    	super.onPause();
-//    	meetingList.close();
-//    }
-    
-
 
     @Override
     public void onDestroy(){
         super.onPause();
+        background.cancel(false);
         meetingList.close();
+        db.close();
     }
 
     class JSON_Parse extends AsyncTask<Void, Void, Cursor>{
+        AtomicBoolean isRunning;
+
+        @Override
+        protected void onPreExecute(){
+            isRunning = new AtomicBoolean(true);
+        }
 
         @Override
         protected Cursor doInBackground(Void... unsused){
-            Cursor newCursor = db.refreshDB();
+            Cursor newCursor = db.refreshDB(isRunning);
             return newCursor;
         }
 
@@ -85,10 +88,16 @@ public class MainActivity extends Activity
         protected void onPostExecute(Cursor cursor) {
             // In the UI thread, make a new cursor with the updated db entries.
             meetingList.close();
-            meetingList = cursor;
-            listView.setAdapter(new EventsCursorAdapter());
-            db.close();
+            if (isRunning.get() && cursor!= null){
+                meetingList = cursor;
+                listView.setAdapter(new EventsCursorAdapter());
+            }
          }
+
+        @Override
+        protected void onCancelled(){
+            isRunning.set(false);
+        }
 
     }
 
