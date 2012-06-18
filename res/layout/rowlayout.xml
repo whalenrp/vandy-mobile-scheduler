@@ -1,31 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_height="48dp"
         android:layout_width="match_parent"
-        android:paddingBottom="5dp">
+        android:paddingBottom="5dp"
+        android:orientation="vertical">
     <TextView
             android:id="@+id/topic"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@color/white"/>
-    <TextView
-            android:id="@+id/speaker"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="20px"
-            android:textColor="@color/white"/>
-    <TextView
-            android:id="@+id/date"
-            android:layout_alignParentRight="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:textColor="@color/white"/>
+			android:ellipsize="end"
+            android:maxLines="1"/>
+    <LinearLayout android:layout_height="wrap_content"
+                  android:layout_width="match_parent"
+                  >
 
-</RelativeLayout>
+		<TextView
+				android:id="@+id/speaker"
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:layout_marginLeft="10dp"
+				android:gravity="left"
+				android:width="0px"
+				android:layout_weight="1"
+				android:ellipsize="end"
+				android:fadingEdge="horizontal"/>
+        <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"/>
+    </LinearLayout>
+</LinearLayout>

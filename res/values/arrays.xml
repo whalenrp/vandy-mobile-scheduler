@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="tabs">
+		<item>Meetings</item>
+		<item>News</item>
+		<item>Teams</item>
+		<item>myVM</item>
+	</string-array>
+</resources>

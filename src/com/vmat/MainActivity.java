@@ -1,5 +1,8 @@
 package com.vmat;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
 import android.view.Window;
+import android.widget.ArrayAdapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
@@ -24,28 +28,49 @@ import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-public class MainActivity extends Activity
+public class MainActivity extends SherlockActivity implements
+	ActionBar.OnNavigationListener
 {
     private ListView listView;
     private Cursor meetingList;
     private EventsDB db;
+	private String[] mTabs;
     private JSON_Parse background;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+		setTheme(R.style.Theme_Sherlock_Light_DarkActionBar);
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+        //requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
         setContentView(R.layout.main);
-        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.headerlayout);
+        //getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.headerlayout);
         listView = (ListView)findViewById(R.id.meetings);
+
+		// Set up the list navigation using ActionBarSherlock.
+		Context ctxt = getSupportActionBar().getThemedContext();
+		mTabs = getResources().getStringArray(R.array.tabs);
+		ArrayAdapter<CharSequence> list = ArrayAdapter.createFromResource(
+				ctxt, R.array.tabs, R.layout.sherlock_spinner_item);
+		list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		getSupportActionBar().setListNavigationCallbacks(list, this);
+
+		// While the background thread updates, fill the list with items from 
+		// previous session.
         db = new EventsDB(this);
         meetingList = db.getReadableDatabase().rawQuery("SELECT * FROM " +
                 EventsDB.TABLE_NAME + " ORDER BY " + EventsDB.DATE, null);
-        background = new JSON_Parse();
+
+		// Start background thread that updates the list of objects.
+        background = new JSON_Parse(); 
         background.execute();
 
+        listView.setAdapter(new EventsCursorAdapter());
+
+		// Launch Detail View on list item click. Pass through the id number from 
+		// the local DB.
         listView.setOnItemClickListener(new OnItemClickListener() {
             @Override
         	public void onItemClick(AdapterView<?> parent, View view,
@@ -57,12 +82,16 @@ public class MainActivity extends Activity
                 intent.putExtra("id", tempCursor.getInt(tempCursor.getColumnIndex("_id")));
                 startActivity(intent);
 
-                finish();
             }
           });
 
-        listView.setAdapter(new EventsCursorAdapter());
         
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        //mSelected.setText("Selected: " + mLocations[itemPosition]);
+        return true;
     }
 
     @Override
@@ -138,7 +167,6 @@ public class MainActivity extends Activity
             }
 
             holder.date.setText(DateFormat.format("EEEE, MMMM d '@' h:mm a", parsed));
-//            holder.date.setText(SimpleDateFormat("E, L dd '@' hh:mm a",));
         }
 
     }
