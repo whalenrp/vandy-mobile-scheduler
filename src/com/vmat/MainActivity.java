@@ -43,10 +43,8 @@ public class MainActivity extends SherlockActivity implements
     {
 		setTheme(R.style.Theme_Sherlock_Light_DarkActionBar);
         super.onCreate(savedInstanceState);
-        //requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+
         setContentView(R.layout.main);
-        //getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.headerlayout);
-        listView = (ListView)findViewById(R.id.meetings);
 
 		// Set up the list navigation using ActionBarSherlock.
 		Context ctxt = getSupportActionBar().getThemedContext();
@@ -56,6 +54,7 @@ public class MainActivity extends SherlockActivity implements
 		list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		getSupportActionBar().setListNavigationCallbacks(list, this);
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 		// While the background thread updates, fill the list with items from 
 		// previous session.
@@ -67,6 +66,7 @@ public class MainActivity extends SherlockActivity implements
         background = new JSON_Parse(); 
         background.execute();
 
+        listView = (ListView)findViewById(R.id.meetings);
         listView.setAdapter(new EventsCursorAdapter());
 
 		// Launch Detail View on list item click. Pass through the id number from 
@@ -77,7 +77,7 @@ public class MainActivity extends SherlockActivity implements
                 int position, long id) {
             	Intent intent = new Intent(MainActivity.this, DetailActivity.class);
 
-                Cursor tempCursor = ((SimpleCursorAdapter)listView.getAdapter()).getCursor();
+                Cursor tempCursor = ((EventsCursorAdapter)listView.getAdapter()).getCursor();
                 tempCursor.moveToPosition(position);
                 intent.putExtra("id", tempCursor.getInt(tempCursor.getColumnIndex("_id")));
                 startActivity(intent);

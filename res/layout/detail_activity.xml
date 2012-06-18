@@ -1,50 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-
-    <TextView
-        android:id="@+id/topic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="14dp"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <TextView
-        android:id="@+id/details"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_below="@+id/textView1"
-        android:layout_marginLeft="60dp"
-        android:layout_marginTop="21dp"
-        android:text="" />
-
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:text="Set Alarm!" />
-
-    <ScrollView
-        android:id="@+id/scrollView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/Details"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="21dp" >
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-        </LinearLayout>
-    </ScrollView>
-
-</RelativeLayout>
+	<TextView android:layout_width="match_parent"
+			  android:layout_height="wrap_content"
+			  android:id="@+id/topic"/>
+	<RelativeLayout android:layout_width="match_parent"
+				  android:layout_height="100dp">
+		<!-- This will eventually be a mapview -->
+		<TextView android:layout_width="wrap_content"
+				  android:layout_height="wrap_content"
+				  android:text="Map Placeholder"
+				  android:gravity="center"
+				  android:id="@+id/mapthumb"/>
+		<TextView android:id="@+id/speaker"
+				  android:layout_toRightOf="@id/mapthumb"
+				  android:layout_alignParentTop="true"
+				  android:layout_width="wrap_content"
+				  android:layout_height="wrap_content"/>
+		<TextView android:id="@+id/date"
+				  android:layout_toRightOf="@id/mapthumb"
+				  android:layout_below="@id/speaker"
+				  android:layout_width="wrap_content"
+				  android:layout_height="wrap_content"/>
+		<TextView android:id="@+id/time"
+				  android:layout_below="@id/date"
+				  android:layout_toRightOf="@id/mapthumb"
+				  android:layout_width="wrap_content"
+				  android:layout_height="wrap_content"/>
+		<TextView android:id="@+id/food_speaker"
+				  android:layout_below="@id/time"
+				  android:layout_toRightOf="@id/mapthumb"
+				  android:layout_width="wrap_content"
+				  android:layout_height="wrap_content"/>
+	</RelativeLayout>
+	<ScrollView android:layout_width="match_parent"
+				android:layout_height="100dp"
+				android:height="0dp"
+				android:layout_weight="1">
+		<TextView android:id="@+id/description"
+				  android:layout_width="match_parent"
+				  android:layout_height="match_parent"/>
+	</ScrollView>
+	<LinearLayout android:layout_width="match_parent"
+				  android:layout_height="wrap_content"
+				  android:weightSum="2"
+				  android:gravity="bottom">
+		<Button android:id="@+id/alarm_button"
+				android:text="Set Alarm"
+				android:width="0dp"
+				android:layout_weight="1"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"/>
+		<Button android:id="@+id/map_button"
+				android:text="Map It!"
+				android:width="0dp"
+				android:layout_weight="1"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"/>
+	</LinearLayout>
+</LinearLayout>

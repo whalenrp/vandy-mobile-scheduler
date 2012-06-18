@@ -1,5 +1,9 @@
 #add filepaths here for ignored .idea files and others.
 */.idea/
+bin/*
+gen/*
+out/*
+
 
 # Compiled source #
 ###################
