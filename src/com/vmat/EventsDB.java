@@ -84,7 +84,7 @@ public class EventsDB extends SQLiteOpenHelper {
 
     }
 
-    public Cursor refreshDB(AtomicBoolean isRunning){
+    public Cursor refreshDB(){
 
         // Connect to webserver, Retrieve JSON objects in JSONArray.
         String jsonString = "";
@@ -103,6 +103,8 @@ public class EventsDB extends SQLiteOpenHelper {
         }catch(IOException e){
             e.printStackTrace();
         }
+		if (jsonString.length() == 0)
+			return null;
         JSONArray jsonArray = null;
         try{
             jsonArray = new JSONArray(jsonString);
@@ -114,46 +116,24 @@ public class EventsDB extends SQLiteOpenHelper {
             e.printStackTrace();
         }
 
-    // Compare latest updated_at time from local db to remote db.
-        //  1) Find latest updated_at time in local db.
-//        Cursor local_cursor = getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY "
-//            + UPDATED_AT + " LIMIT 1", null);
-//        local_cursor.moveToFirst();
-//        String local_updated_at = local_cursor.getString(local_cursor.getColumnIndex(UPDATED_AT));
+		getWritableDatabase().delete(TABLE_NAME, null, null);
+		try{
+			for (int i=0; i< jsonArray.length(); ++i){
+				JSONObject object =  jsonArray.getJSONObject(i);
 
-        //  2) Find latest updated_at time from remote db.
-//        String remote_updated_at = "";
-//        try{
-//            for (int i=0; i< jsonArray.length(); ++i){
-//                JSONObject object =  jsonArray.getJSONObject(i);
-//                String tmp_time = object.getString(UPDATED_AT);
-//                if (tmp_time.)
-//            }
-//        }catch(JSONException e){
-//            e.printStackTrace();
-//        }
+				// Compare latest updated Timestamp to latest timestamp in db.
+				// if different, delete local db and build table again.
+				insert(object.getString(CREATED_AT), object.getString(DATE),
+						object.getString(DAY), object.getString(DESCRIPTION),
+						object.getBoolean(FOOD), object.getBoolean(SPEAKER),
+						object.getString(SPEAKER_NAME), object.getString(TOPIC),
+						object.getString(UPDATED_AT), object.getDouble(XCOORD),
+						object.getDouble(YCOORD), object.getInt(ID));
 
-        //  3) If different than local updated_at time, just reload db. Else do nothing.
-        if (isRunning.get()){
-            getWritableDatabase().delete(TABLE_NAME, null, null);
-            try{
-                for (int i=0; i< jsonArray.length(); ++i){
-                    JSONObject object =  jsonArray.getJSONObject(i);
-
-                    // Compare latest updated Timestamp to latest timestamp in db.
-                    // if different, delete local db and build table again.
-                    insert(object.getString(CREATED_AT), object.getString(DATE),
-                            object.getString(DAY), object.getString(DESCRIPTION),
-                            object.getBoolean(FOOD), object.getBoolean(SPEAKER),
-                            object.getString(SPEAKER_NAME), object.getString(TOPIC),
-                            object.getString(UPDATED_AT), object.getDouble(XCOORD),
-                            object.getDouble(YCOORD), object.getInt(ID));
-
-                }
-            }catch(JSONException e){
-                e.printStackTrace();
-            }
-        }
+			}
+		}catch(JSONException e){
+			e.printStackTrace();
+		}
         // Format the date
 //        String UTCdate = cursor.getString(cursor.getColumnIndex(EventsDB.DATE));
 //        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -163,10 +143,7 @@ public class EventsDB extends SQLiteOpenHelper {
 //        }catch(ParseException e){
 //            e.printStackTrace();
 //        }
-        if (isRunning.get())
-            return getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + DATE, null);
-        else
-            return null;
+		return getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + DATE, null);
     }
 
     // Helper function for reading input stream

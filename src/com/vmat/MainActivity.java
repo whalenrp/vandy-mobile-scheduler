@@ -4,6 +4,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -18,6 +19,8 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.CursorAdapter;
+import android.widget.Toast;
+import android.util.Log;
 
 import android.widget.SimpleCursorAdapter;
 
@@ -31,13 +34,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class MainActivity extends SherlockActivity implements
 	ActionBar.OnNavigationListener
 {
-    private ListView listView;
-    private Cursor meetingList;
-    private EventsDB db;
-	private String[] mTabs;
-    private JSON_Parse background;
+    private ListView listView = null;
+	private ProgressDialog progress = null;
+    private Cursor meetingList = null;
+    private EventsDB db = null;
+	private String[] mTabs = null;
+    private DBsync background = null;
 
-    /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -63,8 +66,20 @@ public class MainActivity extends SherlockActivity implements
                 EventsDB.TABLE_NAME + " ORDER BY " + EventsDB.DATE, null);
 
 		// Start background thread that updates the list of objects.
-        background = new JSON_Parse(); 
-        background.execute();
+		// 	First check to see if the screen has rotated and the update
+		//  has already been started. 
+		background = (DBsync)getLastNonConfigurationInstance();
+		if (background == null){
+			progress = ProgressDialog.show(this, "", "Loading...");
+			background = new DBsync(this); 
+			background.execute();
+		}else{
+			background.attach(this);
+			if (!background.finished()){
+				// set indefinite progress bar
+				progress = ProgressDialog.show(this, "", "Loading...");
+			}
+		}
 
         listView = (ListView)findViewById(R.id.meetings);
         listView.setAdapter(new EventsCursorAdapter());
@@ -84,53 +99,96 @@ public class MainActivity extends SherlockActivity implements
 
             }
           });
-
-        
     }
+
+	@Override
+	public Object onRetainNonConfigurationInstance(){
+		background.detach();
+		return background;
+	}
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        //mSelected.setText("Selected: " + mLocations[itemPosition]);
         return true;
     }
 
     @Override
     public void onDestroy(){
-        super.onPause();
-        background.cancel(false);
+        super.onDestroy();
         meetingList.close();
         db.close();
     }
 
-    class JSON_Parse extends AsyncTask<Void, Void, Cursor>{
-        AtomicBoolean isRunning;
+	public EventsCursorAdapter getEventsAdapter(){
+		return new EventsCursorAdapter();
+	}
+
+	public void markAsDone(){
+		Log.i("Hi", "Progress before");
+		if (progress.isShowing()){
+			progress.dismiss();
+			Log.i("Hi", "Progress after");
+		}
+	}
+
+
+    static class DBsync extends AsyncTask<Void, Void, Cursor>{
+		MainActivity activity = null;
+		boolean finished = false;
+		
+		DBsync(MainActivity activity){
+			attach(activity);
+		}
 
         @Override
         protected void onPreExecute(){
-            isRunning = new AtomicBoolean(true);
         }
 
         @Override
         protected Cursor doInBackground(Void... unsused){
-            Cursor newCursor = db.refreshDB(isRunning);
+			Cursor newCursor = null;
+			if (activity != null)
+				newCursor = activity.db.refreshDB();
             return newCursor;
         }
 
         @Override
         protected void onPostExecute(Cursor cursor) {
             // In the UI thread, make a new cursor with the updated db entries.
-            meetingList.close();
-            if (isRunning.get() && cursor!= null){
-                meetingList = cursor;
-                listView.setAdapter(new EventsCursorAdapter());
-            }
+			if (activity != null && cursor!= null){
+				activity.meetingList.close();
+				activity.meetingList = cursor;
+				activity.listView.setAdapter(
+					activity.getEventsAdapter());
+
+			}
+			// clear indefinite progress bar
+			activity.markAsDone();
+			finished = true;
+
+			// make a dialog here about no internet connection if cursor == null
+			if (cursor == null && activity != null){
+				Toast.makeText(
+					activity, "Woops! A connection to our server could"+
+					" not be established! Please reconnect to the internet to receive"+
+					" the most recent updates. In the meantime, your most recent list"+
+					" of meetings will be shown.", 
+					Toast.LENGTH_LONG)
+					.show();
+			}
          }
 
-        @Override
-        protected void onCancelled(){
-            isRunning.set(false);
-        }
+		void detach(){
+			activity = null;
+		}
 
+		void attach(MainActivity activity){
+			this.activity = activity;
+		}
+
+		boolean finished(){
+			return finished;
+		}
     }
 
     class EventsCursorAdapter extends CursorAdapter{
