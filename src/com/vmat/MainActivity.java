@@ -5,6 +5,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 
 import android.text.format.DateFormat;
 import java.text.SimpleDateFormat;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -151,25 +153,21 @@ public class MainActivity extends SherlockActivity implements
         @Override
         protected void onPostExecute(Cursor cursor) {
             // In the UI thread, make a new cursor with the updated db entries.
-			if (activity != null && cursor!= null){
-				activity.meetingList.close();
-				activity.meetingList = cursor;
-				activity.listView.setAdapter(
-					activity.getEventsAdapter());
+			if (activity != null){
+				if (cursor!= null){
+					activity.meetingList.close();
+					activity.meetingList = cursor;
+					activity.listView.setAdapter(
+						activity.getEventsAdapter());
+				}
+				activity.progress.dismiss();
 
+				// make a dialog here about no internet connection if cursor == null
+				if (cursor == null){
+					activity.showAlert();
+				}
 			}
 			finished = true;
-
-			// make a dialog here about no internet connection if cursor == null
-			if (cursor == null && activity != null){
-				Toast.makeText(
-					activity, "Woops! A connection to our server could"+
-					" not be established! Please reconnect to the internet to receive"+
-					" the most recent updates. In the meantime, your most recent list"+
-					" of meetings will be shown.", 
-					Toast.LENGTH_LONG)
-					.show();
-			}
          }
 
 		void detach(){
@@ -184,6 +182,16 @@ public class MainActivity extends SherlockActivity implements
 			return finished;
 		}
     }
+
+	public void showAlert(){
+		new AlertDialog.Builder(this)
+			.setMessage("Woops! A connection to our server could"+
+					" not be established! Please reconnect to the internet to receive"+
+					" the most recent updates. In the meantime, your most recent list"+
+					" of meetings will be shown.")
+			.setNeutralButton("Okay", null)
+			.show();
+	}
 
     class EventsCursorAdapter extends CursorAdapter{
         EventsCursorAdapter(){
