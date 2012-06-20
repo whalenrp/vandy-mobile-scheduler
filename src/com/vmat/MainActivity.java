@@ -20,12 +20,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.CursorAdapter;
 import android.widget.Toast;
-import android.util.Log;
-
-import android.widget.SimpleCursorAdapter;
 
 import android.text.format.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -44,12 +40,14 @@ public class MainActivity extends SherlockActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+		// required for ActionBarSherlock
 		setTheme(R.style.Theme_Sherlock_Light_DarkActionBar);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.main);
 
 		// Set up the list navigation using ActionBarSherlock.
+		// Make sure that the necessary libraries are linked for this.
 		Context ctxt = getSupportActionBar().getThemedContext();
 		mTabs = getResources().getStringArray(R.array.tabs);
 		ArrayAdapter<CharSequence> list = ArrayAdapter.createFromResource(
@@ -101,12 +99,16 @@ public class MainActivity extends SherlockActivity implements
           });
     }
 
+	// Detach the static ASyncTask from this activity so that it may 
+	// be reattached to the new one after rotation.
 	@Override
 	public Object onRetainNonConfigurationInstance(){
 		background.detach();
 		return background;
 	}
 
+	// Launch separate activities based on the item selected from the 
+	// String array R.array.tabs
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         return true;
@@ -115,22 +117,16 @@ public class MainActivity extends SherlockActivity implements
     @Override
     public void onDestroy(){
         super.onDestroy();
-        meetingList.close();
+        meetingList.close(); 
         db.close();
     }
 
+	/**
+	 * Allows the static DBsync to access an instance of EventsCursorAdapter.
+	 */
 	public EventsCursorAdapter getEventsAdapter(){
 		return new EventsCursorAdapter();
 	}
-
-	public void markAsDone(){
-		Log.i("Hi", "Progress before");
-		if (progress.isShowing()){
-			progress.dismiss();
-			Log.i("Hi", "Progress after");
-		}
-	}
-
 
     static class DBsync extends AsyncTask<Void, Void, Cursor>{
 		MainActivity activity = null;
@@ -162,8 +158,6 @@ public class MainActivity extends SherlockActivity implements
 					activity.getEventsAdapter());
 
 			}
-			// clear indefinite progress bar
-			activity.markAsDone();
 			finished = true;
 
 			// make a dialog here about no internet connection if cursor == null
@@ -224,6 +218,7 @@ public class MainActivity extends SherlockActivity implements
                 e.printStackTrace();
             }
 
+			// ex - Wednesday, January 10 @ 7:30 PM
             holder.date.setText(DateFormat.format("EEEE, MMMM d '@' h:mm a", parsed));
         }
 
