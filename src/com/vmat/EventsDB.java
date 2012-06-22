@@ -44,6 +44,8 @@ public class EventsDB extends SQLiteOpenHelper {
     static final String YCOORD = "ycoordinate";
     static final String ID = "id";
 
+    public static final String DEFAULT_ORDER = DATE;
+
     public EventsDB(Context context){
         super(context, DATABASE_NAME, null, SCHEMA_VERSION);
     }
@@ -82,77 +84,5 @@ public class EventsDB extends SQLiteOpenHelper {
         cv.put(ID, id);
         getWritableDatabase().insert("meetings", null, cv);
 
-    }
-
-    public Cursor refreshDB(){
-
-        // Connect to webserver, Retrieve JSON objects in JSONArray.
-        String jsonString = "";
-        try{
-            URL url = new URL(WEB_ADDRESS);
-            HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
-            try{
-                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-                jsonString = convertStreamToString(in);
-            }finally{
-                urlConnection.disconnect();
-            }
-        }catch(MalformedURLException e){
-            // Make a toast saying the site has moved?
-            e.printStackTrace();
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-		if (jsonString.length() == 0)
-			return null;
-        JSONArray jsonArray = null;
-        try{
-            jsonArray = new JSONArray(jsonString);
-
-        }catch(JSONException e){
-            // Do something more intelligent here..
-            // This is hit when the connection is established, but there is no data
-            // on the page.
-            e.printStackTrace();
-        }
-
-		getWritableDatabase().delete(TABLE_NAME, null, null);
-		try{
-			for (int i=0; i< jsonArray.length(); ++i){
-				JSONObject object =  jsonArray.getJSONObject(i);
-
-				// Compare latest updated Timestamp to latest timestamp in db.
-				// if different, delete local db and build table again.
-				insert(object.getString(CREATED_AT), object.getString(DATE),
-						object.getString(DAY), object.getString(DESCRIPTION),
-						object.getBoolean(FOOD), object.getBoolean(SPEAKER),
-						object.getString(SPEAKER_NAME), object.getString(TOPIC),
-						object.getString(UPDATED_AT), object.getDouble(XCOORD),
-						object.getDouble(YCOORD), object.getInt(ID));
-
-			}
-		}catch(JSONException e){
-			e.printStackTrace();
-		}
-        // Format the date
-//        String UTCdate = cursor.getString(cursor.getColumnIndex(EventsDB.DATE));
-//        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-//        Date parsed = new Date();
-//        try{
-//            parsed = format.parse(UTCdate);
-//        }catch(ParseException e){
-//            e.printStackTrace();
-//        }
-		return getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + DATE, null);
-    }
-
-    // Helper function for reading input stream
-    // retrieved from http://stackoverflow.com/a/5445161/793208
-    private String convertStreamToString(InputStream is){
-        try{
-            return new java.util.Scanner(is).useDelimiter("\\A").next();
-        }catch(NoSuchElementException e){
-            return "";
-        }
     }
 }

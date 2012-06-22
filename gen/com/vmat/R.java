@@ -829,11 +829,12 @@ containing a value of this type.
         public static final int disableHome=0x7f040009;
         public static final int food_speaker=0x7f04002c;
         public static final int homeAsUp=0x7f040006;
+        public static final int list=0x7f040030;
         public static final int listMode=0x7f040002;
         public static final int map_button=0x7f04002f;
         public static final int mapthumb=0x7f040028;
-        public static final int meetings=0x7f040030;
         public static final int normal=0x7f040001;
+        public static final int refresh=0x7f040031;
         public static final int showCustom=0x7f040008;
         public static final int showHome=0x7f040005;
         public static final int showTitle=0x7f040007;
@@ -874,6 +875,9 @@ containing a value of this type.
         public static final int rowlayout=0x7f030017;
         public static final int sherlock_spinner_dropdown_item=0x7f030018;
         public static final int sherlock_spinner_item=0x7f030019;
+    }
+    public static final class menu {
+        public static final int main_menu=0x7f0c0000;
     }
     public static final class string {
         /**  Content description for the action bar "home" affordance. [CHAR LIMIT=NONE] 
