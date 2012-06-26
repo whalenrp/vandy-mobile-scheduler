@@ -7,8 +7,10 @@ import com.actionbarsherlock.view.MenuItem;
 
 import android.support.v4.app.FragmentActivity;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.support.v4.app.LoaderManager;
 import android.app.ProgressDialog;
+import android.app.AlarmManager;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.Loader;
@@ -51,6 +53,24 @@ public class MainActivity extends SherlockFragmentActivity
 
         setContentView(R.layout.main);
 
+        db = new EventsDB(this);
+
+		mAdapter = new EventsCursorAdapter();
+
+		meetings = (ListView)findViewById(R.id.list);
+        meetings.setAdapter(mAdapter);
+
+		// Start the AlarmManager if it hasn't already been started. 
+		// The AlarmManager will take care of syncing the local database
+		// in the background periodically.
+		AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+		Intent intent = new Intent(this, SyncReceiver.class);
+		PendingIntent pi = PendingIntent.getBroadcast(
+			getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		alarmManager.setInexactRepeating(
+			AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, 
+			AlarmManager.INTERVAL_FIFTEEN_MINUTES, pi);
+
 		// Set up the list navigation using ActionBarSherlock.
 		// Make sure that the necessary libraries are linked for this.
 		Context ctxt = getSupportActionBar().getThemedContext();
@@ -61,13 +81,6 @@ public class MainActivity extends SherlockFragmentActivity
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		getSupportActionBar().setListNavigationCallbacks(list, this);
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        db = new EventsDB(this);
-
-		mAdapter = new EventsCursorAdapter();
-
-		meetings = (ListView)findViewById(R.id.list);
-        meetings.setAdapter(mAdapter);
 
 		// Launch Detail View on list item click. Pass through the id number from 
 		// the local DB.

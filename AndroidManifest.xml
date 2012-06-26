@@ -16,5 +16,6 @@
         </activity>
         <activity android:name="DetailActivity"/>
 		<service android:name="SyncService"/>
+		<receiver android:name=".SyncReceiver"/>
     </application>
 </manifest> 
