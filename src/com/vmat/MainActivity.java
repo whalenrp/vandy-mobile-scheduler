@@ -60,27 +60,9 @@ public class MainActivity extends SherlockFragmentActivity
 		meetings = (ListView)findViewById(R.id.list);
         meetings.setAdapter(mAdapter);
 
-		// Start the AlarmManager if it hasn't already been started. 
-		// The AlarmManager will take care of syncing the local database
-		// in the background periodically.
-		AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
-		Intent intent = new Intent(this, SyncReceiver.class);
-		PendingIntent pi = PendingIntent.getBroadcast(
-			getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-		alarmManager.setInexactRepeating(
-			AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, 
-			AlarmManager.INTERVAL_FIFTEEN_MINUTES, pi);
+		scheduleAlarms();
 
-		// Set up the list navigation using ActionBarSherlock.
-		// Make sure that the necessary libraries are linked for this.
-		Context ctxt = getSupportActionBar().getThemedContext();
-		mTabs = getResources().getStringArray(R.array.tabs);
-		ArrayAdapter<CharSequence> list = ArrayAdapter.createFromResource(
-				ctxt, R.array.tabs, R.layout.sherlock_spinner_item);
-		list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
-		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		getSupportActionBar().setListNavigationCallbacks(list, this);
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
+		absInit();
 
 		// Launch Detail View on list item click. Pass through the id number from 
 		// the local DB.
@@ -98,6 +80,32 @@ public class MainActivity extends SherlockFragmentActivity
 		// Prepare the loader to manage cursor to db.
 		getSupportLoaderManager().initLoader(0, null, this);// getSupportLoaderManager?
     }
+
+	// Start the AlarmManager if it hasn't already been started. 
+	// The AlarmManager will take care of syncing the local database
+	// in the background periodically.
+	public void scheduleAlarms(){
+		AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+		Intent intent = new Intent(this, SyncReceiver.class);
+		PendingIntent pi = PendingIntent.getBroadcast(
+			getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		alarmManager.setInexactRepeating(
+			AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, 
+			AlarmManager.INTERVAL_FIFTEEN_MINUTES, pi);
+	}
+
+	// Set up the list navigation using ActionBarSherlock.
+	// Make sure that the necessary libraries are linked for this.
+	public void absInit(){
+		Context ctxt = getSupportActionBar().getThemedContext();
+		mTabs = getResources().getStringArray(R.array.tabs);
+		ArrayAdapter<CharSequence> list = ArrayAdapter.createFromResource(
+				ctxt, R.array.tabs, R.layout.sherlock_spinner_item);
+		list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		getSupportActionBar().setListNavigationCallbacks(list, this);
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
+	}
 
 	public Loader<Cursor> onCreateLoader(int id, Bundle args){
 		return new DBCursorLoader(this, 
