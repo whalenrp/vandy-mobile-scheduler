@@ -40,7 +40,7 @@ public class MainActivity extends SherlockFragmentActivity
 {
 	private EventsCursorAdapter mAdapter = null;
 	private ProgressDialog progress = null;
-    private EventsDB db = null;
+	private EventsDB db = null;
 	private String[] mTabs = null;
 	private ListView meetings = null;
 
@@ -49,16 +49,16 @@ public class MainActivity extends SherlockFragmentActivity
     {
 		// required for ActionBarSherlock
 		setTheme(R.style.Theme_Sherlock_Light_DarkActionBar);
-        super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.main);
+		setContentView(R.layout.main);
 
-        db = new EventsDB(this);
+		db = new EventsDB(this);
 
 		mAdapter = new EventsCursorAdapter();
 
 		meetings = (ListView)findViewById(R.id.list);
-        meetings.setAdapter(mAdapter);
+		meetings.setAdapter(mAdapter);
 
 		scheduleAlarms();
 
@@ -79,7 +79,7 @@ public class MainActivity extends SherlockFragmentActivity
 
 		// Prepare the loader to manage cursor to db.
 		getSupportLoaderManager().initLoader(0, null, this);// getSupportLoaderManager?
-    }
+	}
 
 	// Start the AlarmManager if it hasn't already been started. 
 	// The AlarmManager will take care of syncing the local database
