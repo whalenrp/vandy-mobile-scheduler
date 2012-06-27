@@ -85,4 +85,25 @@ public class EventsDB extends SQLiteOpenHelper {
         getWritableDatabase().insert("meetings", null, cv);
 
     }
+
+    public void update(String where, String[] whereArgs, String created_at, String date,
+					   String day, String description, boolean food, boolean speaker,
+                       String speaker_name, String topic, String updated_at,
+                       double xcoordinate, double ycoordinate, int id)
+    {
+        ContentValues cv = new ContentValues();
+        cv.put(CREATED_AT, created_at);
+        cv.put(DATE, date);
+        cv.put(DAY, day);
+        cv.put(DESCRIPTION, description);
+        cv.put(FOOD, food);
+        cv.put(SPEAKER, speaker);
+        cv.put(SPEAKER_NAME, speaker_name);
+        cv.put(TOPIC, topic);
+        cv.put(UPDATED_AT, updated_at);
+        cv.put(XCOORD, xcoordinate);
+        cv.put(YCOORD, ycoordinate);
+        cv.put(ID, id);
+        getWritableDatabase().update(TABLE_NAME, cv, where, whereArgs);
+    }
 }
