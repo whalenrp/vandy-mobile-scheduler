@@ -11,11 +11,7 @@ import android.view.View;
  * To change this template use File | Settings | File Templates.
  */
 public class ViewHolder {
-    TextView topic = null;
-    TextView speaker = null;
-    TextView date = null;
-//    TextView speaker = null;
-//    TextView date = null;
+    TextView text = null;
     ViewHolder(View base){
         this.topic = (TextView)base.findViewById(R.id.topic);
         this.speaker = (TextView)base.findViewById(R.id.speaker);
