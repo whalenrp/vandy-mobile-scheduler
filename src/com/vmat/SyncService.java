@@ -160,7 +160,8 @@ public class SyncService extends IntentService{
 							object.getString(EventsDB.UPDATED_AT), 
 							object.getDouble(EventsDB.XCOORD),
 							object.getDouble(EventsDB.YCOORD), 
-							object.getInt(EventsDB.ID));
+							object.getInt(EventsDB.ID),
+							(1==mCursor.getInt(mCursor.getColumnIndex(EventsDB.ALARM_ACTIVE))));
 						Log.i("SyncService", "Updated existing entry");
 					}
 				}

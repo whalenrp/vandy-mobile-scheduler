@@ -124,7 +124,7 @@ public class MainActivity extends SherlockFragmentActivity
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data){
 		// Swap the new cursor in. The Framework will take care of closing old cursor.
 		mAdapter.swapCursor(data);
-		Log.i("MainActivity", "Swapping Cursor in response to content Observer");
+		Log.i("MainActivity", "Swapping Cursor");
 	}
 
 	public void onLoaderReset(Loader<Cursor> loader){

@@ -1,13 +1,33 @@
 package com.vmat;
 
-import android.app.Activity;
+import com.google.android.maps.MapView;
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MapActivity;
+import com.google.android.maps.ItemizedOverlay;
+import com.google.android.maps.OverlayItem;
+import com.google.android.maps.MyLocationOverlay;
+import android.content.Intent;
+import android.content.ContentValues;
+import android.app.PendingIntent;
+import android.app.AlarmManager;
+import android.graphics.drawable.Drawable;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Window;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Button;
+import android.util.Log;
 
-public class DetailActivity extends Activity{
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Calendar;
+import java.text.ParseException;
+
+public class DetailActivity extends MapActivity{
+
+	private boolean alarmActive; 
 	private EventsDB hasDatabase; 
 	private Cursor myInfo;
 	private TextView topic;
@@ -17,6 +37,9 @@ public class DetailActivity extends Activity{
 	private TextView food_speaker;
 	private TextView description;
 	private TextView details;
+	private MapView mapthumb;
+	private GeoPoint center;
+	private MyLocationOverlay me = null;
 	
 
     @Override
@@ -31,6 +54,7 @@ public class DetailActivity extends Activity{
 		time = (TextView)findViewById(R.id.time);
 		food_speaker = (TextView)findViewById(R.id.food_speaker);
 		description = (TextView)findViewById(R.id.description);
+		mapthumb = (MapView)findViewById(R.id.mapthumb);
 
 		// Initialize database and cursor
 		hasDatabase = new EventsDB(this);
@@ -39,13 +63,95 @@ public class DetailActivity extends Activity{
 		myInfo = hasDatabase.getReadableDatabase()
 				.rawQuery("SELECT * FROM meetings WHERE _id=? LIMIT 1", index);
         myInfo.moveToFirst();
+		alarmActive = (1==myInfo.getInt(myInfo.getColumnIndex(EventsDB.ALARM_ACTIVE)));
+
+		// Find center geopoint and create map
+		center = getCenter();
+		initMap();
 
 		fillTextViews(myInfo);
 
+		// If this activity is started in response to the alarm, 
+		// show a dialog box saying so.
+		if (getIntent().getIntExtra("alarmReceived", 0) != 0){
+			// make dialog for receiving alarm
+		}
+	}
+
+	@Override
+	public void onPause(){
 		// Clean up
 		myInfo.close();
 		hasDatabase.close();
 	}
+
+
+	@Override
+	protected boolean isRouteDisplayed(){
+		return false;
+	}
+
+	///////////////////////////////////////
+	// Button click listeners
+	///////////////////////////////////////
+
+	/**
+	 * Called when the "Set Alarm" button is selected
+	 */
+	public void alarmSet(View view){
+		AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);	
+
+		// Reads in the stored date, parses it, and stores it in a Calendar object
+		// for the alarm service.
+		String UTCdate = myInfo.getString(myInfo.getColumnIndex(EventsDB.DATE));
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		Date parsedDate = new Date();
+		try{
+			parsedDate = format.parse(UTCdate);
+		}catch(ParseException e){
+			e.printStackTrace();
+		}
+		Calendar alarmCalendar = Calendar.getInstance();
+		alarmCalendar.setTime(parsedDate);
+
+		Intent intent = new Intent(this, DetailActivity.class);
+		PendingIntent pi = PendingIntent.getActivity(
+			getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+		if (!alarmActive){
+			alarmManager.set(AlarmManager.RTC_WAKEUP, alarmCalendar.getTimeInMillis(), pi);
+			Button btn = (Button)findViewById(R.id.alarm_button);
+			btn.setText("Cancel Alarm");
+			alarmActive = true;
+		
+		}
+		else{
+			pi.cancel();
+			Button btn = (Button)findViewById(R.id.alarm_button);
+			btn.setText("Set Alarm");
+			alarmActive = false;
+		}
+
+		// Set the database ALARM_ACTIVE value to 1 if alarm is set, 
+		// otherwise, set to 0.
+		EventsDB db = new EventsDB(this);
+		int numChanged = db.updateAlarm(getIntent().getIntExtra("id", -1), alarmActive);
+		Log.i("DetailActivity", "Number of alarms changed: " + numChanged);
+	}
+
+	/**
+	 * Called when the user opens a map for directions.
+	 * Since google maps should be optional, this will attempt to open 
+	 * a browser and populate the address field in Maps with the destination
+	 * if not available.
+	 */
+	public void openMap(View view){
+
+	}
+
+	///////////////////////////////////////
+	// Helper functions and classes
+	///////////////////////////////////////
 
 	/**
 	 * Private helper function used for updating the values of the TextViews
@@ -69,5 +175,60 @@ public class DetailActivity extends Activity{
 		time.setText(timeText);
 		food_speaker.setText(foodSpeakText);
 		description.setText(descrText);	
+
+		if (alarmActive){
+			Button btn = (Button)findViewById(R.id.alarm_button);
+			btn.setText("Cancel Alarm");
+		}
+	}
+
+	/**
+	 * Initializes the map with the destination and the current location overlays.
+	 */
+	private void initMap(){
+		mapthumb.getController().setCenter(center);
+		mapthumb.getController().setZoom(16);
+		//add destination marker
+		Drawable marker = getResources().getDrawable(R.drawable.pushpin);
+		marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
+		mapthumb.getOverlays().add(new SiteOverlay(marker));
+		// Add location marker
+		me = new MyLocationOverlay(this, mapthumb);
+		mapthumb.getOverlays().add(me);
+
+	}
+
+	private GeoPoint getCenter(){
+		double latitude, longitude;
+		latitude = myInfo.getDouble(myInfo.getColumnIndex(EventsDB.XCOORD));
+		longitude = myInfo.getDouble(myInfo.getColumnIndex(EventsDB.YCOORD));
+		return new GeoPoint((int)(latitude*1000000.0), (int)(longitude*1000000.0));
+	}
+
+
+	/**
+	 * Contains the logic for displaying an overlay for the destination
+	 * and the current position on the minimap
+	 */
+	private class SiteOverlay extends ItemizedOverlay<OverlayItem>{
+		private OverlayItem location;
+
+		public SiteOverlay(Drawable marker){
+			super(marker);
+			boundCenterBottom(marker);
+			location = new OverlayItem(center, "Destination", 
+				topic.getText().toString());
+			populate();
+		}
+
+		@Override
+		public int size(){
+			return 1;
+		}
+
+		@Override
+		protected OverlayItem createItem(int index){
+			return location;
+		}
 	}
 }

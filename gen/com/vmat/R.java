@@ -790,8 +790,9 @@ containing a value of this type.
         public static final int abs__tab_unselected_pressed_holo=0x7f020054;
         public static final int burger_bright=0x7f020055;
         public static final int burger_gray=0x7f020056;
-        public static final int speaker_gray=0x7f020057;
-        public static final int vandymobile_pixelated_big=0x7f020058;
+        public static final int pushpin=0x7f020057;
+        public static final int speaker_gray=0x7f020058;
+        public static final int vandymobile_pixelated_big=0x7f020059;
     }
     public static final class id {
         public static final int abs__action_bar=0x7f040022;
