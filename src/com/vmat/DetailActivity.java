@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.util.Log;
 
 import java.text.SimpleDateFormat;
+import android.text.format.DateFormat;
 import java.util.Date;
 import java.util.Calendar;
 import java.text.ParseException;
@@ -79,11 +80,20 @@ public class DetailActivity extends MapActivity{
 	}
 
 	@Override
+	public void onResume(){
+		super.onResume();
+		me.enableMyLocation();
+	}
+
+	@Override
 	public void onPause(){
+		super.onPause();
 		// Clean up
+		me.disableMyLocation();
 		myInfo.close();
 		hasDatabase.close();
 	}
+
 
 
 	@Override
@@ -160,21 +170,33 @@ public class DetailActivity extends MapActivity{
 	 */
 	private void fillTextViews(Cursor c){
 		// Fill Strings with cursor data
-		String topicText, speakerText, dateText, timeText, foodSpeakText, descrText;
+		String topicText, speakerText, dateText, descrText;
+		boolean isFood;
 		topicText = c.getString(c.getColumnIndex(EventsDB.TOPIC));
 		speakerText = c.getString(c.getColumnIndex(EventsDB.SPEAKER_NAME));
 		dateText = c.getString(c.getColumnIndex(EventsDB.DATE));
-		timeText = "timeText";
-		foodSpeakText = "foodSpeakText";
+		isFood = (1==c.getInt(c.getColumnIndex(EventsDB.FOOD)));
 		descrText = c.getString(c.getColumnIndex(EventsDB.DESCRIPTION));
 
 		// Fill TextViews with Strings
 		topic.setText(topicText);
 		speaker.setText(speakerText);
-		date.setText(dateText);
-		time.setText(timeText);
-		food_speaker.setText(foodSpeakText);
 		description.setText(descrText);	
+		if (isFood)
+			food_speaker.setText("There's food too!");
+
+		// Format the date
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		Date parsed = new Date();
+		try{
+			parsed = format.parse(dateText);
+		}catch(ParseException e){
+			e.printStackTrace();
+		}
+
+		// ex - Wednesday, January 10 @ 7:30 PM
+		date.setText(DateFormat.format("EEEE, MMMM d", parsed));
+		time.setText(DateFormat.format("h:mm a", parsed));
 
 		if (alarmActive){
 			Button btn = (Button)findViewById(R.id.alarm_button);

@@ -98,7 +98,8 @@ public class EventsDB extends SQLiteOpenHelper {
     public void update(String where, String[] whereArgs, String created_at, String date,
 					   String day, String description, boolean food, boolean speaker,
                        String speaker_name, String topic, String updated_at,
-                       double xcoordinate, double ycoordinate, int id, boolean alarmIsSet)
+                       double xcoordinate, double ycoordinate, int id, int _id, 
+					   boolean alarmIsSet)
     {
         ContentValues cv = new ContentValues();
         cv.put(CREATED_AT, created_at);
@@ -127,6 +128,8 @@ public class EventsDB extends SQLiteOpenHelper {
 			alarmCalendar.setTime(parsedDate);
 
 			Intent intent = new Intent(context, DetailActivity.class);
+			intent.putExtra("alarmReceived", 1)
+				.putExtra("id", _id);
 			PendingIntent pi = PendingIntent.getActivity(
 				context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -141,7 +144,7 @@ public class EventsDB extends SQLiteOpenHelper {
 		cv.put(EventsDB.ALARM_ACTIVE, alarmActive);
 		return getWritableDatabase().update(
 			TABLE_NAME, 
-			cv, ALARM_ACTIVE + "=?", 
+			cv, "_id=?", 
 			new String[]{"" + id});
 	}
 }
