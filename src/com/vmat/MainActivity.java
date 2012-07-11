@@ -131,24 +131,24 @@ public class MainActivity extends SherlockFragmentActivity
 		mAdapter.swapCursor(null);
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu){
-		//MenuInflater inflater = getSupportMenuInflater();
-		//inflater.inflate(R.menu.main_menu, menu);
-		menu.add("Refresh")
-			.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item){
-		if (item.getTitle().toString().equals("Refresh")){
-			Intent i = new Intent(this, SyncService.class);
-			i.putExtra("action", SyncService.MEETING_SYNC);
-			startService(i);
-		}
-		return true;
-	}
+//	@Override
+//	public boolean onCreateOptionsMenu(Menu menu){
+//		//MenuInflater inflater = getSupportMenuInflater();
+//		//inflater.inflate(R.menu.main_menu, menu);
+//		menu.add("Refresh")
+//			.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+//		return true;
+//	}
+//
+//	@Override
+//	public boolean onOptionsItemSelected(MenuItem item){
+//		if (item.getTitle().toString().equals("Refresh")){
+//			Intent i = new Intent(this, SyncService.class);
+//			i.putExtra("action", SyncService.MEETING_SYNC);
+//			startService(i);
+//		}
+//		return true;
+//	}
 
 	// Launch separate activities based on the item selected from the 
 	// String array R.array.tabs

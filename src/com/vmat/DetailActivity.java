@@ -56,6 +56,7 @@ public class DetailActivity extends SherlockMapActivity{
 		setTheme(R.style.Theme_Sherlock_Light_DarkActionBar);
         super.onCreate(savedInstantState);
         setContentView(R.layout.detail_activity);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		// Initialize Textviews
 		topic = (TextView)findViewById(R.id.topic);
