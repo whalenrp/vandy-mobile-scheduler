@@ -1,5 +1,6 @@
 package com.vmat;
 
+import com.actionbarsherlock.app.SherlockMapActivity;
 import com.google.android.maps.MapView;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Button;
 import android.util.Log;
+import android.net.Uri;
 
 import java.text.SimpleDateFormat;
 import android.text.format.DateFormat;
@@ -26,7 +28,13 @@ import java.util.Date;
 import java.util.Calendar;
 import java.text.ParseException;
 
-public class DetailActivity extends MapActivity{
+/**
+ * DetailActivity is called when an item from the main meetings viewer
+ * is selected. An intent is passed in to DetailActivity containing the 
+ * _id field from the corresponding item in the database with which to 
+ * populate the activity. 
+ */
+public class DetailActivity extends SherlockMapActivity{
 
 	private boolean alarmActive; 
 	private EventsDB hasDatabase; 
@@ -45,6 +53,7 @@ public class DetailActivity extends MapActivity{
 
     @Override
 	public void onCreate(Bundle savedInstantState){
+		setTheme(R.style.Theme_Sherlock_Light_DarkActionBar);
         super.onCreate(savedInstantState);
         setContentView(R.layout.detail_activity);
 
@@ -58,12 +67,8 @@ public class DetailActivity extends MapActivity{
 		mapthumb = (MapView)findViewById(R.id.mapthumb);
 
 		// Initialize database and cursor
-		hasDatabase = new EventsDB(this);
-		String[] index = new String[1];
-		index[0] = "" + getIntent().getIntExtra("id", -1);
-		myInfo = hasDatabase.getReadableDatabase()
-				.rawQuery("SELECT * FROM meetings WHERE _id=? LIMIT 1", index);
-        myInfo.moveToFirst();
+		startManagingData();
+
 		alarmActive = (1==myInfo.getInt(myInfo.getColumnIndex(EventsDB.ALARM_ACTIVE)));
 
 		// Find center geopoint and create map
@@ -83,6 +88,10 @@ public class DetailActivity extends MapActivity{
 	public void onResume(){
 		super.onResume();
 		me.enableMyLocation();
+		if (myInfo.isClosed()){
+			// Initialize database and cursor
+			startManagingData();
+		}
 	}
 
 	@Override
@@ -99,6 +108,16 @@ public class DetailActivity extends MapActivity{
 	@Override
 	protected boolean isRouteDisplayed(){
 		return false;
+	}
+
+	private void startManagingData(){
+		hasDatabase = new EventsDB(this);
+		String[] index = new String[1];
+		index[0] = "" + getIntent().getIntExtra("id", -1);
+		myInfo = hasDatabase.getReadableDatabase()
+				.rawQuery("SELECT * FROM meetings WHERE _id=? LIMIT 1", index);
+        myInfo.moveToFirst();
+
 	}
 
 	///////////////////////////////////////
@@ -156,7 +175,12 @@ public class DetailActivity extends MapActivity{
 	 * if not available.
 	 */
 	public void openMap(View view){
-
+		String url = new String("http://maps.google.com/maps?daddr=" +
+			center.getLatitudeE6()/1000000.0 + "," + center.getLongitudeE6()/1000000.0);
+		Log.i("DetailActivity", url);
+		Intent intent = new Intent(android.content.Intent.ACTION_VIEW, 
+			Uri.parse(url));
+		startActivity(intent);
 	}
 
 	///////////////////////////////////////
