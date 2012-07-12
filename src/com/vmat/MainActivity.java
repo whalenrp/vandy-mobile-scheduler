@@ -61,7 +61,6 @@ public class MainActivity extends SherlockFragmentActivity
 		meetings.setAdapter(mAdapter);
 
 		scheduleAlarms();
-
 		absInit();
 
 		// Launch Detail View on list item click. Pass through the id number from 
@@ -154,6 +153,15 @@ public class MainActivity extends SherlockFragmentActivity
 	// String array R.array.tabs
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+    	
+    	// Temporary code to let me see the teams activity:
+    	String selectedTab = mTabs[itemPosition];
+    	if (selectedTab.equals("Teams"))
+    	{
+    		Intent i = new Intent(this, TeamsActivity.class);
+    		startActivity(i);
+    	}
+    	
         return true;
     }
 
