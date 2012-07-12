@@ -28,6 +28,7 @@
 		<service android:name="SyncService"/>
 
 		<receiver android:name=".SyncReceiver"/>
+		<activity android:name="TeamsActivity"></activity>
 
     </application>
 </manifest> 
