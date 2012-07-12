@@ -16,6 +16,7 @@ import com.actionbarsherlock.app.ActionBar;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -23,6 +24,9 @@ import android.os.Bundle;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -48,8 +52,23 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 		SQLiteDatabase db = new TeamsOpenHelper(this).getReadableDatabase();
 		Cursor c = db.query("teams", PROJECTION, null, null, null, null, null);
 		adapter = new TeamsCursorAdapter(this);
+		adapter.swapCursor(c);
+		
 		
 		listView.setAdapter(adapter);
+		listView.setOnItemClickListener(new OnItemClickListener()
+		{
+			@Override
+			public void onItemClick(AdapterView<?> parent, View v, int pos, long id) 
+			{
+				Intent i = new Intent(TeamsActivity.this, TeamsDetailActivity.class);
+				Cursor c = adapter.getCursor();
+				c.moveToPosition(pos);
+				i.putExtra("_id", c.getInt(c.getColumnIndex("_id")));
+				startActivity(i);
+			}
+			
+		});
 		
 		// Set up Action Bar Sherlock
 		Context context = getSupportActionBar().getThemedContext();
@@ -61,7 +80,7 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 		getSupportActionBar().setListNavigationCallbacks(navList, this);
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		
-		new LoadDataTask().execute();
+//		new LoadDataTask().execute();
 	}
 
 	// ActionBar.OnNavigationListener Method

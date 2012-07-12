@@ -29,6 +29,7 @@
 
 		<receiver android:name=".SyncReceiver"/>
 		<activity android:name="TeamsActivity"></activity>
+		<activity android:name="TeamsDetailActivity"></activity>
 
     </application>
 </manifest> 
