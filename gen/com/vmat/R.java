@@ -790,9 +790,10 @@ containing a value of this type.
         public static final int abs__tab_unselected_pressed_holo=0x7f020054;
         public static final int burger_bright=0x7f020055;
         public static final int burger_gray=0x7f020056;
-        public static final int pushpin=0x7f020057;
-        public static final int speaker_gray=0x7f020058;
-        public static final int vandymobile_pixelated_big=0x7f020059;
+        public static final int ic_dialog_alert_holo_light=0x7f020057;
+        public static final int pushpin=0x7f020058;
+        public static final int speaker_gray=0x7f020059;
+        public static final int vandymobile_pixelated_big=0x7f02005a;
     }
     public static final class id {
         public static final int abs__action_bar=0x7f040022;
@@ -830,6 +831,7 @@ containing a value of this type.
         public static final int disableHome=0x7f040009;
         public static final int food_speaker=0x7f04002c;
         public static final int homeAsUp=0x7f040006;
+        public static final int img_app_icon=0x7f040031;
         public static final int list=0x7f040030;
         public static final int listMode=0x7f040002;
         public static final int map_button=0x7f04002f;
@@ -840,6 +842,8 @@ containing a value of this type.
         public static final int showTitle=0x7f040007;
         public static final int speaker=0x7f040029;
         public static final int tabMode=0x7f040003;
+        public static final int text_app_tagline=0x7f040033;
+        public static final int text_app_title=0x7f040032;
         public static final int time=0x7f04002b;
         public static final int topic=0x7f040027;
         public static final int useLogo=0x7f040004;
@@ -876,6 +880,7 @@ containing a value of this type.
         public static final int sherlock_spinner_dropdown_item=0x7f030018;
         public static final int sherlock_spinner_item=0x7f030019;
         public static final int teams=0x7f03001a;
+        public static final int teams_row=0x7f03001b;
     }
     public static final class string {
         /**  Content description for the action bar "home" affordance. [CHAR LIMIT=NONE] 

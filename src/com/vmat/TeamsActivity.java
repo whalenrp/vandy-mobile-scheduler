@@ -31,6 +31,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 public class TeamsActivity extends SherlockFragmentActivity implements ActionBar.OnNavigationListener
 {
 	private static final String TAG = "TeamsActivity";
+	private static final String[] PROJECTION = new String[] { "_id", "name", "description" };
 	
 	private ListView listView;
 	private String[] tabs;
@@ -45,9 +46,9 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 		listView = (ListView)findViewById(R.id.list);
 		
 		SQLiteDatabase db = new TeamsOpenHelper(this).getReadableDatabase();
-		Cursor c = db.query("teams", new String[] { "_id", "name" }, null, null, null, null, null);
-		adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, c, 
-										  new String[] {"name"}, new int[] { android.R.id.text1 }, 0);
+		Cursor c = db.query("teams", PROJECTION, null, null, null, null, null);
+		adapter = new TeamsCursorAdapter(this);
+		
 		listView.setAdapter(adapter);
 		
 		// Set up Action Bar Sherlock
@@ -139,7 +140,7 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 					c.close();
 				}
 				
-				adapter.swapCursor(db.query("teams", new String[] { "_id", "name" }, null, null, null, null, null));
+				adapter.swapCursor(db.query("teams", PROJECTION, null, null, null, null, null));
 			} 
 			catch (JSONException e) 
 			{
