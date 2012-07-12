@@ -61,7 +61,6 @@ public class MainActivity extends SherlockFragmentActivity
 		meetings.setAdapter(mAdapter);
 
 		scheduleAlarms();
-
 		absInit();
 
 		// Launch Detail View on list item click. Pass through the id number from 

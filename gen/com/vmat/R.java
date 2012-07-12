@@ -835,7 +835,6 @@ containing a value of this type.
         public static final int map_button=0x7f04002f;
         public static final int mapthumb=0x7f040028;
         public static final int normal=0x7f040001;
-        public static final int refresh=0x7f040031;
         public static final int showCustom=0x7f040008;
         public static final int showHome=0x7f040005;
         public static final int showTitle=0x7f040007;
@@ -876,9 +875,7 @@ containing a value of this type.
         public static final int rowlayout=0x7f030017;
         public static final int sherlock_spinner_dropdown_item=0x7f030018;
         public static final int sherlock_spinner_item=0x7f030019;
-    }
-    public static final class menu {
-        public static final int main_menu=0x7f0c0000;
+        public static final int teams=0x7f03001a;
     }
     public static final class string {
         /**  Content description for the action bar "home" affordance. [CHAR LIMIT=NONE] 
@@ -1949,7 +1946,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
          */
         public static final int[] SherlockSpinner = {
             0x010100af, 0x01010175, 0x01010176, 0x0101017b,
-            0x01010262, 0x010102ac, 0x010102ad, 0x010103ef
+            0x01010262, 0x010102ac, 0x010102ad, 0x010103fd
         };
         /**
           <p>
