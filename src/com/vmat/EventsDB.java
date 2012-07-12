@@ -1,29 +1,17 @@
 package com.vmat;
 
-import android.app.AlarmManager;
-import android.content.Intent;
-import android.app.PendingIntent;
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.NoSuchElementException;
-import java.util.concurrent.atomic.AtomicBoolean;
+
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 
 /**
  * @author Richard Whalen
@@ -116,7 +104,7 @@ public class EventsDB extends SQLiteOpenHelper {
         cv.put(ID, id);
 
 		if (alarmIsSet){
-			AlarmManager alarmManager = (AlarmManager)context.getSystemService(context.ALARM_SERVICE);	
+			AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);	
 			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 			Date parsedDate = new Date();
 			try{

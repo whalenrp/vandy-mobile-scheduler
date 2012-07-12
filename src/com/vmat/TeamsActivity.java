@@ -12,8 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.actionbarsherlock.app.ActionBar;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -22,7 +20,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.CursorAdapter;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -30,6 +27,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 public class TeamsActivity extends SherlockFragmentActivity implements ActionBar.OnNavigationListener
@@ -41,6 +39,7 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 	private String[] tabs;
 	private CursorAdapter adapter;
 	
+	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		setTheme(R.style.Theme_Sherlock_Light_DarkActionBar);
@@ -80,7 +79,7 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 		getSupportActionBar().setListNavigationCallbacks(navList, this);
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		
-//		new LoadDataTask().execute();
+		new LoadDataTask().execute();
 	}
 
 	// ActionBar.OnNavigationListener Method
@@ -121,6 +120,7 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 			return null;
 		}
 		
+		@Override
 		protected void onPostExecute(String result)
 		{
 			try 

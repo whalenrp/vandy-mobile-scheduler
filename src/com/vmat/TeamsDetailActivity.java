@@ -1,15 +1,10 @@
 package com.vmat;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import android.app.Activity;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,6 +17,7 @@ public class TeamsDetailActivity extends Activity
 	TextView textTeam;
 	TextView textDescription;
 	
+	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		setTheme(R.style.Theme_Sherlock_Light_DarkActionBar);

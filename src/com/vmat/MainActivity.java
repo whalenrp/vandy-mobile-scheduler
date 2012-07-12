@@ -1,37 +1,31 @@
 package com.vmat;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-import android.support.v4.app.FragmentActivity;
-import android.app.AlertDialog;
-import android.app.PendingIntent;
-import android.support.v4.app.LoaderManager;
-import android.app.ProgressDialog;
 import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
+import android.text.format.DateFormat;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.LayoutInflater;
-import android.view.Window;
-import android.widget.ArrayAdapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.support.v4.widget.CursorAdapter;
-import android.widget.Toast;
 
-import android.text.format.DateFormat;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
-import java.util.Date;
-import android.util.Log;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 
 public class MainActivity extends SherlockFragmentActivity 
@@ -66,6 +60,7 @@ public class MainActivity extends SherlockFragmentActivity
 		// Launch Detail View on list item click. Pass through the id number from 
 		// the local DB.
 		meetings.setOnItemClickListener(new OnItemClickListener(){
+			@Override
 			public void onItemClick(AdapterView parent, View v, int pos, long id){
 				Intent intent = new Intent(MainActivity.this, DetailActivity.class);
 
@@ -106,6 +101,7 @@ public class MainActivity extends SherlockFragmentActivity
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 	}
 
+	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args){
 		return new DBCursorLoader(this, 
 			SyncService.MEETING_URI,
@@ -120,12 +116,14 @@ public class MainActivity extends SherlockFragmentActivity
 			null); // limit
 	}
 
+	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data){
 		// Swap the new cursor in. The Framework will take care of closing old cursor.
 		mAdapter.swapCursor(data);
 		Log.i("MainActivity", "Swapping Cursor");
 	}
 
+	@Override
 	public void onLoaderReset(Loader<Cursor> loader){
 		mAdapter.swapCursor(null);
 	}

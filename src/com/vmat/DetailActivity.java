@@ -1,32 +1,29 @@
 package com.vmat;
 
-import com.actionbarsherlock.app.SherlockMapActivity;
-import com.google.android.maps.MapView;
-import com.google.android.maps.GeoPoint;
-import com.google.android.maps.MapActivity;
-import com.google.android.maps.ItemizedOverlay;
-import com.google.android.maps.OverlayItem;
-import com.google.android.maps.MyLocationOverlay;
-import android.content.Intent;
-import android.content.ContentValues;
-import android.app.PendingIntent;
-import android.app.AlarmManager;
-import android.graphics.drawable.Drawable;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.os.Bundle;
-import android.view.Window;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Button;
-import android.util.Log;
-import android.net.Uri;
-
-import java.text.SimpleDateFormat;
-import android.text.format.DateFormat;
-import java.util.Date;
-import java.util.Calendar;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Bundle;
+import android.text.format.DateFormat;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+import com.actionbarsherlock.app.SherlockMapActivity;
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.ItemizedOverlay;
+import com.google.android.maps.MapView;
+import com.google.android.maps.MyLocationOverlay;
+import com.google.android.maps.OverlayItem;
 
 /**
  * DetailActivity is called when an item from the main meetings viewer
