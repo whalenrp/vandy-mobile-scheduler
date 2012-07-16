@@ -27,7 +27,8 @@
 
 		<service android:name="SyncService"/>
 
-		<receiver android:name=".SyncReceiver"/>
+		<receiver android:name=".SyncReceiver"
+				  android:exported="false"/>
 
     </application>
 </manifest> 

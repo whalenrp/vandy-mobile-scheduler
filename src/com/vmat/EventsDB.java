@@ -49,6 +49,7 @@ public class EventsDB extends SQLiteOpenHelper {
     static final String YCOORD = "ycoordinate";
     static final String ID = "id";
     static final String ALARM_ACTIVE = "alarmActive";
+    static final String ALARM_TIME_PRIOR = "alarmTime";
 
     public static final String DEFAULT_ORDER = DATE;
 
@@ -63,7 +64,7 @@ public class EventsDB extends SQLiteOpenHelper {
                 "created_at TEXT, date TEXT, day TEXT, description TEXT," +
                 "food INTEGER, id INTEGER, speaker INTEGER, speaker_name TEXT," +
                 "topic TEXT, updated_at TEXT, xcoordinate REAL, ycoordinate REAL, " +
-				"alarmActive INTEGER);");
+				"alarmActive INTEGER, alarmMinutes INTEGER, alarmTime REAL);");
     }
 
     @Override
@@ -91,6 +92,7 @@ public class EventsDB extends SQLiteOpenHelper {
         cv.put(YCOORD, ycoordinate);
         cv.put(ID, id);
 		cv.put(ALARM_ACTIVE, 0);
+		cv.put(ALARM_TIME_PRIOR, 0);
         getWritableDatabase().insert("meetings", null, cv);
 
     }
@@ -99,7 +101,7 @@ public class EventsDB extends SQLiteOpenHelper {
 					   String day, String description, boolean food, boolean speaker,
                        String speaker_name, String topic, String updated_at,
                        double xcoordinate, double ycoordinate, int id, int _id, 
-					   boolean alarmIsSet)
+					   boolean alarmIsSet, long millisPrior)
     {
         ContentValues cv = new ContentValues();
         cv.put(CREATED_AT, created_at);
@@ -133,15 +135,17 @@ public class EventsDB extends SQLiteOpenHelper {
 			PendingIntent pi = PendingIntent.getActivity(
 				context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-			alarmManager.set(AlarmManager.RTC_WAKEUP, alarmCalendar.getTimeInMillis(), pi);
+			alarmManager.set(AlarmManager.RTC_WAKEUP, 
+				alarmCalendar.getTimeInMillis() - millisPrior, pi);
 
 		}
         getWritableDatabase().update(TABLE_NAME, cv, where, whereArgs);
     }
 
-	public int updateAlarm(int id, boolean alarmActive){
+	public int updateAlarm(int id, boolean alarmActive, long alarmTime){
 		ContentValues cv = new ContentValues();
 		cv.put(EventsDB.ALARM_ACTIVE, alarmActive);
+		cv.put(EventsDB.ALARM_TIME_PRIOR, alarmTime);
 		return getWritableDatabase().update(
 			TABLE_NAME, 
 			cv, "_id=?", 

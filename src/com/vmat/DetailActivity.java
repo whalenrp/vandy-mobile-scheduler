@@ -3,19 +3,18 @@ package com.vmat;
 import com.actionbarsherlock.app.SherlockMapActivity;
 import com.google.android.maps.MapView;
 import com.google.android.maps.GeoPoint;
-import com.google.android.maps.MapActivity;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.OverlayItem;
 import com.google.android.maps.MyLocationOverlay;
 import android.content.Intent;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.app.PendingIntent;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.graphics.drawable.Drawable;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.view.Window;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Button;
@@ -37,6 +36,12 @@ import java.text.ParseException;
 public class DetailActivity extends SherlockMapActivity{
 
 	private boolean alarmActive; 
+
+	// if -1, it will launch the dialog box when the alarm button is pressed and
+	// cancel it if already set.
+	// if anything else, the alarm will be set to that time.
+	public long millisPrior = -1;
+
 	private EventsDB hasDatabase; 
 	private Cursor myInfo;
 	private TextView topic;
@@ -82,6 +87,7 @@ public class DetailActivity extends SherlockMapActivity{
 		// show a dialog box saying so.
 		if (getIntent().getIntExtra("alarmReceived", 0) != 0){
 			// make dialog for receiving alarm
+			alarmTriggeredDialog();
 		}
 	}
 
@@ -129,44 +135,14 @@ public class DetailActivity extends SherlockMapActivity{
 	 * Called when the "Set Alarm" button is selected
 	 */
 	public void alarmSet(View view){
-		AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);	
-
-		// Reads in the stored date, parses it, and stores it in a Calendar object
-		// for the alarm service.
-		String UTCdate = myInfo.getString(myInfo.getColumnIndex(EventsDB.DATE));
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		Date parsedDate = new Date();
-		try{
-			parsedDate = format.parse(UTCdate);
-		}catch(ParseException e){
-			e.printStackTrace();
-		}
-		Calendar alarmCalendar = Calendar.getInstance();
-		alarmCalendar.setTime(parsedDate);
-
-		Intent intent = new Intent(this, DetailActivity.class);
-		PendingIntent pi = PendingIntent.getActivity(
-			getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-		if (!alarmActive){
-			alarmManager.set(AlarmManager.RTC_WAKEUP, alarmCalendar.getTimeInMillis(), pi);
-			Button btn = (Button)findViewById(R.id.alarm_button);
-			btn.setText("Cancel Alarm");
-			alarmActive = true;
 		
-		}
-		else{
-			pi.cancel();
-			Button btn = (Button)findViewById(R.id.alarm_button);
-			btn.setText("Set Alarm");
-			alarmActive = false;
-		}
-
-		// Set the database ALARM_ACTIVE value to 1 if alarm is set, 
-		// otherwise, set to 0.
-		EventsDB db = new EventsDB(this);
-		int numChanged = db.updateAlarm(getIntent().getIntExtra("id", -1), alarmActive);
-		Log.i("DetailActivity", "Number of alarms changed: " + numChanged);
+		if ( !alarmActive )
+			// Will create a dialog box listener that will call switchAlarm
+			// if an option is selected. 
+			setAlarmMillisPrior();
+		else 
+			// This will cancel an active alarm
+			switchAlarm();
 	}
 
 	/**
@@ -183,6 +159,61 @@ public class DetailActivity extends SherlockMapActivity{
 			Uri.parse(url));
 		startActivity(intent);
 	}
+
+	/**
+	 * Private function used to set the alarm and set the appropriate fields in the 
+	 * database based on their current state.
+	 */
+	 private void switchAlarm(){
+
+		AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);	
+
+		// Reads in the stored date, parses it, and stores it in a Calendar object
+		// for the alarm service.
+		String UTCdate = myInfo.getString(myInfo.getColumnIndex(EventsDB.DATE));
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		Date parsedDate = new Date();
+		try{
+			parsedDate = format.parse(UTCdate);
+		}catch(ParseException e){
+			e.printStackTrace();
+		}
+		Calendar alarmCalendar = Calendar.getInstance();
+		alarmCalendar.setTime(parsedDate);
+
+		Intent intent = new Intent(this, DetailActivity.class);
+		intent.putExtra("id", myInfo.getInt(myInfo.getColumnIndex("_id"))).
+			putExtra("alarmReceived", 1);
+		PendingIntent pi = PendingIntent.getActivity(
+			getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+		if (!alarmActive){
+
+			long alarmTime = alarmCalendar.getTimeInMillis() - millisPrior;
+
+			alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTime, pi);
+			Button btn = (Button)findViewById(R.id.alarm_button);
+			btn.setText("Cancel Alarm");
+			alarmActive = true;
+		
+		}
+		else{
+			millisPrior = 0;
+			alarmManager.cancel(pi);
+			Button btn = (Button)findViewById(R.id.alarm_button);
+			btn.setText("Set Alarm");
+			alarmActive = false;
+		}
+
+		// Set the database ALARM_ACTIVE value to 1 if alarm is set, 
+		// otherwise, set to 0.
+		EventsDB db = new EventsDB(this);
+		int numChanged = db.updateAlarm(getIntent().getIntExtra("id", -1), 
+			alarmActive, millisPrior);
+		db.close();
+		Log.i("DetailActivity", "Number of alarms changed: " + numChanged);
+
+	 }
 
 	///////////////////////////////////////
 	// Helper functions and classes
@@ -227,6 +258,52 @@ public class DetailActivity extends SherlockMapActivity{
 			Button btn = (Button)findViewById(R.id.alarm_button);
 			btn.setText("Cancel Alarm");
 		}
+	}
+
+	/**
+	 * Creates a dialog box which presents the user with a number of time intervals.
+	 * The time interval they select will be stored in the database with the 
+	 * corresponding entry, and the alarm will go off that number of minutes
+	 * before the start of the meeting/event.
+	 * @return the number of minutes before the event at which the alarm will go off.
+	 * or -1 if the dialog was cancelled without a time set.
+	 */
+	private void setAlarmMillisPrior(){
+		final CharSequence[] items = {"On time", "5 minutes before", "10 minutes before",
+			"15 minutes before", "30 minutes before", "1 hour before"};
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("At what time?")
+			.setItems(items, new DialogInterface.OnClickListener(){
+				public void onClick(DialogInterface dialog, int item){
+					switch (item){
+						case 0: millisPrior = 0; break;
+						case 1: millisPrior = (5 * 1000 * 60) ; break;
+						case 2: millisPrior = (10 * 1000 * 60) ; break;
+						case 3: millisPrior = (15 * 1000 * 60) ; break;
+						case 4: millisPrior = (30 * 1000 * 60) ; break;
+						case 5: millisPrior = (60 * 1000 * 60) ; break;
+						default:millisPrior = -1;
+					}
+					switchAlarm();
+				}
+			});
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+
+	/**
+	 * Creates a dialog box in response to the event alarm going off.
+	 */
+	private void alarmTriggeredDialog(){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("This event is starting soon!")
+			.setPositiveButton("Okay", new DialogInterface.OnClickListener(){
+				public void onClick(DialogInterface dialog, int id){
+					dialog.cancel();
+				}
+			});
+		AlertDialog alert = builder.create();
+		alert.show();
 	}
 
 	/**
