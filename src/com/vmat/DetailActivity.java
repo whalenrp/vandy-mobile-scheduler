@@ -1,29 +1,19 @@
 package com.vmat;
 
 import com.actionbarsherlock.app.SherlockMapActivity;
+
 import com.google.android.maps.MapView;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.OverlayItem;
 import com.google.android.maps.MyLocationOverlay;
-import android.content.Intent;
-import android.content.ContentValues;
-import android.content.DialogInterface;
+
 import android.app.PendingIntent;
 import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.AlertDialog;
-import android.graphics.drawable.Drawable;
-import android.database.Cursor;
-import android.os.Bundle;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -33,6 +23,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 
 
 /**
