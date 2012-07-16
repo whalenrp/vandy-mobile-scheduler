@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.content.Loader.ForceLoadContentObserver;
 
 /**
  * Custom Cursor Loader that will sync with a database rather than 
