@@ -29,8 +29,7 @@ public class TeamsCursorAdapter extends CursorAdapter
 		appIcon.setImageDrawable(icon);
 		
 		titleText.setText(cursor.getString(cursor.getColumnIndex("name")));
-		// Description also used in place of tagline until it's loaded to server
-		taglineText.setText(cursor.getString(cursor.getColumnIndex("description")));
+		taglineText.setText(cursor.getString(cursor.getColumnIndex("tagline")));
 	}
 
 	@Override

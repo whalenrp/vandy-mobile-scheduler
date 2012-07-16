@@ -33,7 +33,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 public class TeamsActivity extends SherlockFragmentActivity implements ActionBar.OnNavigationListener
 {
 	private static final String TAG = "TeamsActivity";
-	private static final String[] PROJECTION = new String[] { "_id", "name", "description" };
+	private static final String[] PROJECTION = new String[] { "_id", "name", "tagline" };
 	
 	private ListView listView;
 	private String[] tabs;
@@ -138,7 +138,7 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 					cv.put("name", o.getString("name"));
 					cv.put("os", o.getString("os"));
 					cv.put("team", o.getJSONObject("team").getString("name"));
-//					cv.put("tagline", o.getString("tagline"));
+					cv.put("tagline", o.getString("tagline"));
 					cv.put("description", o.getString("description"));
 					cv.put("server_id", o.getInt("id"));
 					cv.put("team_id", o.getInt("team_id"));

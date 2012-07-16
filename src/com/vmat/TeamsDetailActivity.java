@@ -40,7 +40,7 @@ public class TeamsDetailActivity extends Activity
     	if (c.moveToFirst())
     	{
     		textTitle.setText(c.getString(c.getColumnIndex("name")));
-//        	textTagline.setText(c.getString(c.getColumnIndex("tagline")));
+        	textTagline.setText(c.getString(c.getColumnIndex("tagline")));
         	textOs.setText(c.getString(c.getColumnIndex("os")));
         	textTeam.setText(c.getString(c.getColumnIndex("team")));
         	textDescription.setText(c.getString(c.getColumnIndex("description")));
