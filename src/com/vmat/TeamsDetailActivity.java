@@ -1,21 +1,27 @@
 package com.vmat;
 
-import android.app.Activity;
+import com.actionbarsherlock.app.SherlockActivity;
+
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class TeamsDetailActivity extends Activity
+public class TeamsDetailActivity extends SherlockActivity
 {
-	ImageView appIcon;
-	TextView textTitle;
-	TextView textTagline;
-	TextView textOs;
-	TextView textTeam;
-	TextView textDescription;
+	private ImageView appIcon;
+	private TextView textTitle;
+	private TextView textTagline;
+	private TextView textOs;
+	private TextView textTeam;
+	private TextView textDescription;
+	private ImageButton googlePlayButton;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -32,6 +38,17 @@ public class TeamsDetailActivity extends Activity
     	textOs = (TextView)findViewById(R.id.text_os);
     	textTeam = (TextView)findViewById(R.id.text_team);
     	textDescription = (TextView)findViewById(R.id.text_description);
+    	googlePlayButton = (ImageButton)findViewById(R.id.goog_play_button);
+    	
+    	googlePlayButton.setOnClickListener(new View.OnClickListener() 
+    	{
+			public void onClick(View v) 
+			{
+				Intent intent = new Intent(Intent.ACTION_VIEW);
+				intent.setData(Uri.parse("https://play.google.com/store/apps"));
+				startActivity(intent);
+			}
+		});
     	
     	int rowId = getIntent().getIntExtra("_id", -1);
     	SQLiteDatabase db = new TeamsOpenHelper(this).getReadableDatabase();

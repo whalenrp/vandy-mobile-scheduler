@@ -127,9 +127,12 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 			{
 				JSONArray jsonArray = new JSONArray(result);
 				SQLiteDatabase db = new TeamsOpenHelper(TeamsActivity.this).getWritableDatabase();
+				String entriesToDelete = "server_id NOT IN (-1";
 				for (int i = 0; i < jsonArray.length(); i++)
 				{
 					JSONObject o = jsonArray.getJSONObject(i);
+					
+					entriesToDelete += "," + o.getInt("id");
 					
 					Cursor c = db.query("teams", new String[] { "server_id" }, "server_id="+o.getInt("id"),
 										null, null, null, null);
@@ -159,6 +162,9 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 					c.close();
 				}
 				
+				entriesToDelete += ")";
+				Log.v(TAG, "deleting: " + entriesToDelete);
+				db.delete("teams", entriesToDelete, null);
 				adapter.swapCursor(db.query("teams", PROJECTION, null, null, null, null, null));
 			} 
 			catch (JSONException e) 
