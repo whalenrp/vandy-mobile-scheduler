@@ -77,15 +77,22 @@ public class MainActivity extends SherlockFragmentActivity
 
 	// Start the AlarmManager if it hasn't already been started. 
 	// The AlarmManager will take care of syncing the local database
-	// in the background periodically.
+	// in the background periodically and triggering any alarms the user has set
 	public void scheduleAlarms(){
+		// Sets up repeating meeting database sync
 		AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
 		Intent intent = new Intent(this, SyncReceiver.class);
+		intent.setAction(SyncReceiver.SYNC);
 		PendingIntent pi = PendingIntent.getBroadcast(
 			getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		alarmManager.setInexactRepeating(
 			AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, 
 			AlarmManager.INTERVAL_FIFTEEN_MINUTES, pi);
+
+		// Reinitializes any alarms
+		Intent alarmIntent = new Intent(this, SyncReceiver.class);
+		alarmIntent.setAction(SyncReceiver.RESET_ALARMS);
+		sendBroadcast(alarmIntent);
 	}
 
 	// Set up the list navigation using ActionBarSherlock.
