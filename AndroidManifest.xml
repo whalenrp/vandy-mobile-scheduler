@@ -29,10 +29,10 @@
 
 		<activity android:name="TeamsDetailActivity"/>
 		
-		<activity android:name=".MyVmMain"
+		<activity android:name="MyVmMain"
 			android:label=""/>
 
-		<activity android:name=".MyVmUserPage"
+		<activity android:name="MyVmUserPage"
 			android:label=""/>
 
 		<service android:name="SyncService"/>
@@ -40,5 +40,6 @@
 		<receiver android:name=".SyncReceiver"
 				  android:exported="false"/>
 
-    </application>
+		<activity android:name="GithubDetailActivity"></activity>
+	</application>
 </manifest> 

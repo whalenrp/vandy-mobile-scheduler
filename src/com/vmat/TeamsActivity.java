@@ -25,6 +25,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -33,7 +34,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 public class TeamsActivity extends SherlockFragmentActivity implements ActionBar.OnNavigationListener
 {
 	private static final String TAG = "TeamsActivity";
-	private static final String[] PROJECTION = new String[] { "_id", "name", "description" };
+	private static final String[] PROJECTION = new String[] { "_id", "name", "tagline" };
 	
 	private ListView listView;
 	private String[] tabs;
@@ -47,6 +48,32 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 		setContentView(R.layout.teams);
 		
 		listView = (ListView)findViewById(R.id.list);
+		
+		//////////////////////////////////////////////////////////////////////////////
+		
+		Button gitButton = (Button)findViewById(R.id.git_button);
+		SQLiteDatabase dbtemp = new GeneralOpenHelper(getApplicationContext()).getReadableDatabase();
+		Cursor ctemp = dbtemp.query("github_projects", null, null, null, null, null, null);
+		if (!ctemp.moveToFirst())
+		{
+			ContentValues cv = new ContentValues(2);
+			cv.put("title", "vandy-mobile-scheduler");
+			cv.put("project_id", 4499644);
+			Long i = dbtemp.insert("github_projects", null, cv);
+			Log.v(TAG, "Row inserted at id " + i + " in table github_projects");
+		}
+		dbtemp.close();
+		gitButton.setOnClickListener(new View.OnClickListener() 
+		{
+			public void onClick(View v) 
+			{
+				Intent i = new Intent(TeamsActivity.this, GithubDetailActivity.class);
+				i.putExtra("project_id", 4499644);
+				startActivity(i);
+			}
+		});
+		
+		//////////////////////////////////////////////////////////////////////////////
 		
 		SQLiteDatabase db = new TeamsOpenHelper(this).getReadableDatabase();
 		Cursor c = db.query("teams", PROJECTION, null, null, null, null, null);
@@ -92,6 +119,7 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 	
 	class LoadDataTask extends AsyncTask<Void, Void, String>
 	{
+		private static final String TAG = "TeamsActivity$LoadDataTask";
 		private static final String TEAMS_URL = "http://70.138.50.84/apps.json";
 		
 		@Override
@@ -111,7 +139,7 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
+				Log.w(TAG, e.toString());
 			}
 			finally
 			{
@@ -125,11 +153,16 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 		{
 			try 
 			{
+				if (result == null)
+					return;
 				JSONArray jsonArray = new JSONArray(result);
 				SQLiteDatabase db = new TeamsOpenHelper(TeamsActivity.this).getWritableDatabase();
+				String entriesToDelete = "server_id NOT IN (-1";
 				for (int i = 0; i < jsonArray.length(); i++)
 				{
 					JSONObject o = jsonArray.getJSONObject(i);
+					
+					entriesToDelete += "," + o.getInt("id");
 					
 					Cursor c = db.query("teams", new String[] { "server_id" }, "server_id="+o.getInt("id"),
 										null, null, null, null);
@@ -138,7 +171,7 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 					cv.put("name", o.getString("name"));
 					cv.put("os", o.getString("os"));
 					cv.put("team", o.getJSONObject("team").getString("name"));
-//					cv.put("tagline", o.getString("tagline"));
+					cv.put("tagline", o.getString("tagline"));
 					cv.put("description", o.getString("description"));
 					cv.put("server_id", o.getInt("id"));
 					cv.put("team_id", o.getInt("team_id"));
@@ -159,11 +192,14 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 					c.close();
 				}
 				
+				entriesToDelete += ")";
+				Log.v(TAG, "deleting: " + entriesToDelete);
+				db.delete("teams", entriesToDelete, null);
 				adapter.swapCursor(db.query("teams", PROJECTION, null, null, null, null, null));
 			} 
 			catch (JSONException e) 
 			{
-				e.printStackTrace();
+				Log.w(TAG, e.toString());
 			}
 		}
 	}
