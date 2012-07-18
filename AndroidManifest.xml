@@ -25,12 +25,20 @@
         <activity android:name="DetailActivity"
 				  android:label=""/>
 
+		<activity android:name="TeamsActivity"/>
+
+		<activity android:name="TeamsDetailActivity"/>
+		
+		<activity android:name=".MyVmMain"
+			android:label=""/>
+
+		<activity android:name=".MyVmUserPage"
+			android:label=""/>
+
 		<service android:name="SyncService"/>
 
 		<receiver android:name=".SyncReceiver"
 				  android:exported="false"/>
-		<activity android:name="TeamsActivity"></activity>
-		<activity android:name="TeamsDetailActivity"></activity>
 
     </application>
 </manifest> 

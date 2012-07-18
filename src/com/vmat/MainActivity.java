@@ -166,6 +166,11 @@ public class MainActivity extends SherlockFragmentActivity
     		Intent i = new Intent(this, TeamsActivity.class);
     		startActivity(i);
     	}
+    	if ( selectedTab.equals("myVM") )
+    	{
+    		Intent i = new Intent(this, MyVmMain.class);
+    		startActivity(i);
+    	}
     	
         return true;
     }
