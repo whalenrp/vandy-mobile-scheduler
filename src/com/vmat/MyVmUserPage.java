@@ -8,16 +8,20 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
 public class MyVmUserPage extends SherlockActivity
 {
+	private static final String TAG = "MyVmUserPage";
+	
 	TextView userInfo;
 	ListView teamList;
 	JSONObject[] teams;
@@ -30,44 +34,61 @@ public class MyVmUserPage extends SherlockActivity
 		userInfo = (TextView)findViewById(R.id.userInfo);
 		teamList = (ListView)findViewById(R.id.teams);
 		
-		fillTextViews();
-		teamList.setAdapter(new JSONAdapter());
-
-		teamList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-			@Override
-			public void onItemClick(AdapterView parent, View childView, int pos, long id){
-				Intent i = new Intent(this, GithubDetailActivity.java);
-				i.putExtra("teamJSON", teams[pos].toString());
-				startActivity(i);
-			}
-		});
+		try
+		{
+			fillTextViews();
+		}
+		catch (JSONException e)
+		{
+			Log.w(TAG, e.toString());
+		}
+		
+		if (teams != null)
+		{
+			teamList.setAdapter(new JSONAdapter());
+			
+			teamList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+				@Override
+				public void onItemClick(AdapterView parent, View childView, int pos, long id){
+					Intent i = new Intent(MyVmUserPage.this, GithubDetailActivity.class);
+					i.putExtra("teamJSON", teams[pos].toString());
+					startActivity(i);
+				}
+			});
+		}
+		
+		
 	}
 
-	private void fillTextViews(){
-		SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+	private void fillTextViews() throws JSONException
+	{
+		SharedPreferences prefs = getSharedPreferences("user-settings", MODE_PRIVATE);
 		JSONObject userJSON = new JSONObject(prefs.getString("userInfo", ""));
 
-		String username = userJSON.getString("username");
-		String email = userJSON.getString("email");
+//		String username = userJSON.getString("username");
+//		String email = userJSON.getString("email");
 
 		JSONArray userTeams = userJSON.getJSONArray("teams");
 		if ( userTeams.length() == 1 ){
-			startActivity(new Intent(this, GithubDetailActivity.java));
+			Intent i = new Intent(MyVmUserPage.this, GithubDetailActivity.class);
+			i.putExtra("teamJSON", userTeams.getJSONObject(0).toString());
+			startActivity(i);
 			finish();
 		}
 		else{
-			
 			// fill the teamNames array with the teamnames in the JSONArray
 			teams = new JSONObject[userTeams.length()];
 			for (int i = 0; i < userTeams.length(); ++i)
-				//teams[i] = new JSONObject(userTeams.getJSONObject(i).toString());
+//				teams[i] = new JSONObject(userTeams.getJSONObject(i).toString());
 				teams[i] = userTeams.getJSONObject(i);
 		}
 	}
 
 	private class JSONAdapter extends ArrayAdapter<JSONObject>{
 		public JSONAdapter(){
+			
 			super(MyVmUserPage.this, android.R.layout.two_line_list_item, teams);
+			
 		}
 
 		// set text1's text to the team name and 
@@ -77,8 +98,17 @@ public class MyVmUserPage extends SherlockActivity
             View row = inflater.inflate(android.R.layout.two_line_list_item, parent, false);
 			TextView text1 = (TextView)row.findViewById(android.R.id.text1);
 			TextView text2 = (TextView)row.findViewById(android.R.id.text2);
-			text1.setText(teams[pos].getString("name"));
-			text2.setText(teams[pos].getJSONObject("app").getString("name"));
+			try
+			{
+				text1.setText(teams[pos].getString("name"));
+				text2.setText(teams[pos].getJSONObject("app").getString("name"));
+			}
+			catch (JSONException e)
+			{
+				Log.w(TAG, "In JSONAdapter: " + e.toString());
+			}
+			
+			return row;
 		}
 
 	}

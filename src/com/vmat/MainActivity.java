@@ -4,11 +4,16 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -46,7 +51,48 @@ public class MainActivity extends SherlockFragmentActivity
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.main);
-
+		
+		//////////////////////////////////////////////////////
+		
+		JSONObject o = new JSONObject();
+		try
+		{
+			JSONObject app = new JSONObject();
+			app.put("name", "vandy-mobile-scheduler");
+			app.put("id", 4499644);
+			app.put("url", "https://api.github.com/repos/whalenrp/vandy-mobile-scheduler/commits");
+			JSONArray teams = new JSONArray();
+			JSONObject t = new JSONObject();
+			t.put("name", "Team VandyMobile");
+			t.put("app", app);
+			teams.put(t);
+			o.put("username", "Tom Nguyen");
+			o.put("email", "tom@onstarterlabs.com");
+			o.put("teams", teams);
+		}
+		catch (JSONException e)
+		{
+			e.printStackTrace();
+		}
+	
+//		final String s = "{\"username\" : \"tom nguyen\" ,"
+//				+ 		  "\"email\" : \"tom@onstarterlabs.com\" ,"
+//				+         "\"teams\" : [{ \"name\" : \"Team VandyMobile\" ,"
+//				+ 						 "\"app\" : { \"name\" : \"VandyMobile\" ,"
+//    			+									 "\"id\" : 4499644 }}]}";
+		
+		
+		SharedPreferences settings = getSharedPreferences("user-settings", Context.MODE_PRIVATE);
+		if (!settings.contains("userInfo"))
+		{
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putString("userInfo", o.toString());
+			editor.commit();
+			Log.v("MainActivity", "Commiting userInfo: " + o.toString());
+		}
+		
+		//////////////////////////////////////////////////////
+		
 		db = new EventsDB(this);
 
 		mAdapter = new EventsCursorAdapter();

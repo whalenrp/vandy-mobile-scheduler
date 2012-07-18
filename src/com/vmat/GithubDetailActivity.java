@@ -2,8 +2,6 @@ package com.vmat;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -19,9 +17,9 @@ import org.json.JSONObject;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.CursorAdapter;
@@ -54,33 +52,50 @@ public class GithubDetailActivity extends SherlockActivity
 		
 		commitList = (ListView)findViewById(R.id.commit_list);
 		projectTitleText = (TextView)findViewById(R.id.text_project_title);
+	
+		String commits_url = "";
+		try 
+		{
+			JSONObject o = new JSONObject(getIntent().getStringExtra("teamJSON"));
+			projectId = o.getJSONObject("app").getInt("id");
+			commits_url = o.getJSONObject("app").getString("url");
+			projectTitleText.setText(o.getJSONObject("app").getString("name"));
+		} 
+		catch (JSONException e) 
+		{
+			Log.e(TAG, e.toString());
+		} 
 		
-		projectId = getIntent().getIntExtra("project_id", -1);
 		SQLiteDatabase db = new GeneralOpenHelper(this).getReadableDatabase();
 		
-		// Get info for top view
-		Cursor topViewCursor = db.query("github_projects", null, "project_id="+projectId, null, null, null, null);
-		if (topViewCursor.moveToFirst())
-		{
-			projectTitleText.setText(topViewCursor.getString(topViewCursor.getColumnIndex("title")));
-		}
-		topViewCursor.close();
-		
 		// May need to be sort-ordered by date...
-		Cursor c = db.query("github_commits", PROJECTION, "project_id="+projectId, null, null, null, null);
+		Cursor c = db.query("github_commits", PROJECTION, "project_id="+projectId,
+				null, null, null, null);
 		adapter = new GithubDetailRowAdapter();
 		adapter.swapCursor(c);
 		commitList.setAdapter(adapter);
 		
-		Cursor getSha = db.query("github_projects", new String[] { "last_sha" }, "project_id="+projectId, null, null, null, null);
+		// Lazy loading of github_projects row. If it doesn't already exist, create it here.
 		String sha = null;
-		if (getSha.moveToFirst())
+		Cursor proj = db.query("github_projects", new String[] { "last_sha" },
+									"project_id="+projectId, null, null, null, null);
+		if (!proj.moveToFirst())
 		{
-			sha = getSha.getString(getSha.getColumnIndex("last_sha"));
+			ContentValues cv = new ContentValues(1);
+			cv.put("project_id", projectId);
+			db.insert("github_projects", null, cv);
 		}
-		getSha.close();
+		else
+		{
+			sha = proj.getString(proj.getColumnIndex("last_sha"));
+		}
+		proj.close();
 		db.close();
-		new FetchGithubTask().execute(sha);
+		if (sha != null)
+		{
+			commits_url += "?sha=" + sha;
+		}
+		new FetchGithubTask().execute(commits_url);
 	}
 	
 	private class FetchGithubTask extends AsyncTask<String, Void, String>
@@ -89,15 +104,9 @@ public class GithubDetailActivity extends SherlockActivity
 		// For now only downloads the one project. In the future when 
 		// project locations are standardized, multiple project downloads 
 		// can be automated, even selecting by user-involved projects.
-		private String commits_url = "https://api.github.com/repos/whalenrp/vandy-mobile-scheduler/commits";
 		
-		protected String doInBackground(String... shas)
+		protected String doInBackground(String... urls)
 		{
-			if (shas[0] != null)
-				commits_url += "sha?="+shas[0];
-			
-			Log.d(TAG, commits_url);
-			
 			HttpClient httpClient = new DefaultHttpClient();
 			try
 			{
@@ -106,7 +115,7 @@ public class GithubDetailActivity extends SherlockActivity
 		        HttpConnectionParams.setSoTimeout(params, 30 * 1000);
 		        ConnManagerParams.setTimeout(params, 30 * 1000);
 		        
-		        HttpGet httpget = new HttpGet(commits_url);
+		        HttpGet httpget = new HttpGet(urls[0]);
 				ResponseHandler<String> responseHandler = new BasicResponseHandler();
 				return httpClient.execute(httpget, responseHandler);
 			}
@@ -123,10 +132,10 @@ public class GithubDetailActivity extends SherlockActivity
 		
 		protected void onPostExecute(String results)
 		{
+			SQLiteDatabase db = new GeneralOpenHelper(getApplicationContext()).getWritableDatabase();
 			try
 			{
 				JSONArray commits = new JSONArray(results);
-				SQLiteDatabase db = new GeneralOpenHelper(getApplicationContext()).getWritableDatabase();
 				for (int i = 0; i < commits.length(); i++)
 				{
 					JSONObject o = commits.getJSONObject(i);
@@ -153,14 +162,18 @@ public class GithubDetailActivity extends SherlockActivity
 					int i = db.update("github_projects", cv, "project_id="+projectId, null);
 					Log.v(TAG, i + " row(s) updated with new sha " + latest_sha);
 				}
-				
-				db.close();
+			
+				Cursor c = db.query("github_commits", PROJECTION, "project_id="+projectId, null, null, null, null);
+				adapter.swapCursor(c);
 			}
 			catch (JSONException e)
 			{
 				Log.w(TAG, e.toString());
 			}
-			
+			finally
+			{
+				db.close();
+			}
 		}
 	}
 	

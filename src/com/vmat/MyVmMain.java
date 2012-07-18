@@ -42,10 +42,11 @@ public class MyVmMain extends SherlockActivity
 
 		// If the user is already logged in, his/her info will be stored, so
 		// open the next activity with the info loaded.
-		SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+		SharedPreferences prefs = getSharedPreferences("user-settings", MODE_PRIVATE);
 		String userInfo = prefs.getString("userInfo", "empty");
 		if ( !userInfo.equals("empty") ){
-			startActivity(new Intent(this, MyVmUserPage.class));
+			
+			startActivity(new Intent(MyVmMain.this, MyVmUserPage.class));
 			//finish();
 		}
 
