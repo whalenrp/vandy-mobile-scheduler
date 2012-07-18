@@ -788,10 +788,14 @@ containing a value of this type.
         public static final int abs__tab_selected_holo=0x7f020052;
         public static final int abs__tab_selected_pressed_holo=0x7f020053;
         public static final int abs__tab_unselected_pressed_holo=0x7f020054;
-        public static final int burger_bright=0x7f020055;
-        public static final int burger_gray=0x7f020056;
-        public static final int speaker_gray=0x7f020057;
-        public static final int vandymobile_pixelated_big=0x7f020058;
+        public static final int android_app_on_play_logo_small=0x7f020055;
+        public static final int burger_bright=0x7f020056;
+        public static final int burger_gray=0x7f020057;
+        public static final int ic_dialog_alert_holo_light=0x7f020058;
+        public static final int ic_jog_dial_answer=0x7f020059;
+        public static final int pushpin=0x7f02005a;
+        public static final int speaker_gray=0x7f02005b;
+        public static final int vandymobile_pixelated_big=0x7f02005c;
     }
     public static final class id {
         public static final int abs__action_bar=0x7f040022;
@@ -828,18 +832,27 @@ containing a value of this type.
         public static final int description=0x7f04002d;
         public static final int disableHome=0x7f040009;
         public static final int food_speaker=0x7f04002c;
+        public static final int goog_play_button=0x7f040038;
         public static final int homeAsUp=0x7f040006;
+        public static final int img_app_icon=0x7f040031;
         public static final int list=0x7f040030;
         public static final int listMode=0x7f040002;
         public static final int map_button=0x7f04002f;
         public static final int mapthumb=0x7f040028;
         public static final int normal=0x7f040001;
-        public static final int refresh=0x7f040031;
+        public static final int platform_label=0x7f040036;
         public static final int showCustom=0x7f040008;
         public static final int showHome=0x7f040005;
         public static final int showTitle=0x7f040007;
         public static final int speaker=0x7f040029;
         public static final int tabMode=0x7f040003;
+        public static final int text_app_tagline=0x7f04003a;
+        public static final int text_app_title=0x7f040039;
+        public static final int text_description=0x7f040037;
+        public static final int text_os=0x7f040035;
+        public static final int text_tagline=0x7f040034;
+        public static final int text_team=0x7f040032;
+        public static final int text_title=0x7f040033;
         public static final int time=0x7f04002b;
         public static final int topic=0x7f040027;
         public static final int useLogo=0x7f040004;
@@ -875,9 +888,9 @@ containing a value of this type.
         public static final int rowlayout=0x7f030017;
         public static final int sherlock_spinner_dropdown_item=0x7f030018;
         public static final int sherlock_spinner_item=0x7f030019;
-    }
-    public static final class menu {
-        public static final int main_menu=0x7f0c0000;
+        public static final int teams=0x7f03001a;
+        public static final int teams_detail_activity=0x7f03001b;
+        public static final int teams_row=0x7f03001c;
     }
     public static final class string {
         /**  Content description for the action bar "home" affordance. [CHAR LIMIT=NONE] 
@@ -1948,7 +1961,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
          */
         public static final int[] SherlockSpinner = {
             0x010100af, 0x01010175, 0x01010176, 0x0101017b,
-            0x01010262, 0x010102ac, 0x010102ad, 0x010103ef
+            0x01010262, 0x010102ac, 0x010102ad, 0x010103fd
         };
         /**
           <p>

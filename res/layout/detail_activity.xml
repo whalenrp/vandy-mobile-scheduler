@@ -1,18 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="2.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 	<TextView android:layout_width="match_parent"
 			  android:layout_height="wrap_content"
+			  android:textSize="25sp"
+			  android:textStyle="bold"
 			  android:id="@+id/topic"/>
 	<RelativeLayout android:layout_width="match_parent"
-				  android:layout_height="100dp">
-		<!-- This will eventually be a mapview -->
-		<TextView android:layout_width="wrap_content"
-				  android:layout_height="wrap_content"
-				  android:text="Map Placeholder"
+				  android:paddingTop="5dp"
+				  android:layout_height="170dp">
+		<com.google.android.maps.MapView
+				  android:layout_width="170dp"
+				  android:layout_height="fill_parent"
+				  android:apiKey="0kpUpdnexvo0z_zCHn7OlfOs-Gb6sZJTCob4L6w"
 				  android:gravity="center"
+				  android:paddingLeft="5dp"
+				  android:paddingRight="5dp"
 				  android:id="@+id/mapthumb"/>
 		<TextView android:id="@+id/speaker"
 				  android:layout_toRightOf="@id/mapthumb"
@@ -51,11 +56,13 @@
 				android:text="Set Alarm"
 				android:width="0dp"
 				android:layout_weight="1"
+				android:onClick="alarmSet"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"/>
 		<Button android:id="@+id/map_button"
 				android:text="Map It!"
 				android:width="0dp"
+				android:onClick="openMap"
 				android:layout_weight="1"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"/>

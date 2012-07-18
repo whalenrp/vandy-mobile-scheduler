@@ -1,25 +1,23 @@
 package com.vmat;
 
-import android.app.IntentService;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.Cursor;
-import android.content.Intent;
-import android.net.Uri;
-import android.util.Log;
-
-import java.lang.String;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.MalformedURLException;
-import java.io.InputStream;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.NoSuchElementException;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONArray;
+
+import android.app.IntentService;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.util.Log;
 
 public class SyncService extends IntentService{
 	static final int TWITTER_SYNC = 0;
@@ -160,7 +158,10 @@ public class SyncService extends IntentService{
 							object.getString(EventsDB.UPDATED_AT), 
 							object.getDouble(EventsDB.XCOORD),
 							object.getDouble(EventsDB.YCOORD), 
-							object.getInt(EventsDB.ID));
+							object.getInt(EventsDB.ID),
+							object.getInt("_id"),
+							(1==mCursor.getInt(mCursor.getColumnIndex(EventsDB.ALARM_ACTIVE))),
+							mCursor.getLong(mCursor.getColumnIndex(EventsDB.ALARM_TIME_PRIOR)));
 						Log.i("SyncService", "Updated existing entry");
 					}
 				}
