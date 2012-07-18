@@ -32,6 +32,5 @@
 		<activity android:name="TeamsActivity"></activity>
 		<activity android:name="TeamsDetailActivity"></activity>
 		<activity android:name="GithubDetailActivity"></activity>
-
-    </application>
+	</application>
 </manifest> 

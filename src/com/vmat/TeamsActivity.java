@@ -62,6 +62,7 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 			Long i = dbtemp.insert("github_projects", null, cv);
 			Log.v(TAG, "Row inserted at id " + i + " in table github_projects");
 		}
+		dbtemp.close();
 		gitButton.setOnClickListener(new View.OnClickListener() 
 		{
 			public void onClick(View v) 
@@ -118,6 +119,7 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 	
 	class LoadDataTask extends AsyncTask<Void, Void, String>
 	{
+		private static final String TAG = "TeamsActivity$LoadDataTask";
 		private static final String TEAMS_URL = "http://70.138.50.84/apps.json";
 		
 		@Override
@@ -137,7 +139,7 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
+				Log.w(TAG, e.toString());
 			}
 			finally
 			{
@@ -197,7 +199,7 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 			} 
 			catch (JSONException e) 
 			{
-				e.printStackTrace();
+				Log.w(TAG, e.toString());
 			}
 		}
 	}

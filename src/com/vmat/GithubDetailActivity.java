@@ -85,6 +85,7 @@ public class GithubDetailActivity extends SherlockActivity
 	
 	private class FetchGithubTask extends AsyncTask<String, Void, String>
 	{
+		private static final String TAG = "GithubDetailActivity$FetchGithubTask";
 		// For now only downloads the one project. In the future when 
 		// project locations are standardized, multiple project downloads 
 		// can be automated, even selecting by user-involved projects.
@@ -94,6 +95,8 @@ public class GithubDetailActivity extends SherlockActivity
 		{
 			if (shas[0] != null)
 				commits_url += "sha?="+shas[0];
+			
+			Log.d(TAG, commits_url);
 			
 			HttpClient httpClient = new DefaultHttpClient();
 			try
@@ -109,7 +112,7 @@ public class GithubDetailActivity extends SherlockActivity
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
+				Log.w(TAG, e.toString());
 			}
 			finally
 			{
@@ -155,7 +158,7 @@ public class GithubDetailActivity extends SherlockActivity
 			}
 			catch (JSONException e)
 			{
-				e.printStackTrace();
+				Log.w(TAG, e.toString());
 			}
 			
 		}
