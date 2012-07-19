@@ -29,6 +29,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -41,6 +42,8 @@ public class GithubDetailActivity extends SherlockActivity
 	
 	private ListView commitList;
 	private TextView projectTitleText;
+	private Button emailButton;
+	private TextView membersText;
 	
 	private CursorAdapter adapter;
 	private int projectId;
@@ -53,6 +56,8 @@ public class GithubDetailActivity extends SherlockActivity
 		
 		commitList = (ListView)findViewById(R.id.commit_list);
 		projectTitleText = (TextView)findViewById(R.id.text_project_title);
+		emailButton = (Button)findViewById(R.id.btn_email);
+		membersText = (TextView)findViewById(R.id.text_members);
 	
 		String commits_url = "";
 		try 

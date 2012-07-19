@@ -22,6 +22,24 @@
             android:text="(Project Title)"
             android:textSize="30dip" />
 
+        <TextView
+            android:id="@+id/text_members"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/text_project_title"
+            android:paddingLeft="10dip"
+            android:paddingTop="10dip"
+            android:text="(members)" />
+
+        <Button
+            android:id="@+id/btn_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/text_members"
+            android:layout_alignParentRight="true"
+            android:text="Email" />
+
     </RelativeLayout>
 
     <ListView
