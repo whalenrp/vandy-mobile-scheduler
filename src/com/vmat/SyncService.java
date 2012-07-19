@@ -78,8 +78,69 @@ public class SyncService extends IntentService{
 	}
 
 	private void syncTwitterDB(){
+	    String jsonString = "";
+	InputStream in = null;
+	try{
+		Log.i("SyncService","PreStream");
+	    in = new BufferedInputStream(conn.getInputStream());
 
+		Log.i("SyncService","GotStream");
 	}
+	catch(IOException e){
+	    e.printStackTrace();
+	    return;
+	}
+	
+	jsonString = convertStreamToString(in);
+	Log.i("SyncService","Converted To String");
+	if (jsonString.length() == 0) 
+	    return;
+	
+	JSONArray jsonArray = null;
+	try{
+	    jsonArray = new JSONArray(jsonString);
+	}catch(JSONException e){
+	    e.printStackTrace();
+	}
+	Log.i("SyncService","Created null JSON Array");
+	TwitterDB twitterdb = new TwitterDB(this);
+	Log.i("SyncService","Created null a TwitterDB");
+	//db.getWritableDatabase().delete(EventsDB.TABLE_NAME, null, null);
+
+	Log.i("SyncService","About to call get Writeable DB: ");//+ jsonArray.length() );
+	SQLiteDatabase  mDB = twitterdb.getWritableDatabase();
+
+	String[] columns = {TwitterDB.TEXT};
+	try{
+	    for (int i = 0; i < jsonArray.length(); ++i){
+
+	    Log.i("SyncService","Called: " + i + " times");
+		JSONObject object =  jsonArray.getJSONObject(i);
+		//checking db so there are no repeats.
+		
+		
+		String text = object.getString(TwitterDB.TEXT);
+		Cursor mCursor = mDB.query(TwitterDB.TABLE_NAME, columns, 
+				   TwitterDB.TEXT + "=?",
+				   new String[]{text},
+				   null, null, null, "1");
+		
+		if(mCursor.getCount()==0)
+		{
+			twitterdb.insert(object.getString(TwitterDB.CREATED_AT), 
+				 object.getString(TwitterDB.TEXT));
+			Log.i("SyncService", "Inserted new entry");
+	    }
+	    }
+	}
+	    catch(JSONException e){
+	    	e.printStackTrace();
+	    }
+	getContentResolver().notifyChange(twitterURI, null);
+	twitterdb.close();
+	Log.i("SyncService", "Database Refreshed");
+    }
+	
 
 	private void syncMeetingDB(){
 

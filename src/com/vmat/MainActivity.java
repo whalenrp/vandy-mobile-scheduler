@@ -166,6 +166,11 @@ public class MainActivity extends SherlockFragmentActivity
     		Intent i = new Intent(this, TeamsActivity.class);
     		startActivity(i);
     	}
+    	else if (selectedTab.equals("Twitter"))
+    	{
+    		Intent i = new Intent(this, TwitterActivity.class);
+    		startActivity(i);
+    	}
     	
         return true;
     }

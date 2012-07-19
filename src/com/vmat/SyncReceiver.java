@@ -49,6 +49,7 @@ public class SyncReceiver extends BroadcastReceiver{
 
 			if (c.getCount() == 0){
 				c.close();
+				db.close();
 				return;
 			}
 
