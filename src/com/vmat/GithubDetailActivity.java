@@ -2,6 +2,8 @@ package com.vmat;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -17,7 +19,6 @@ import org.json.JSONObject;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -75,35 +76,13 @@ public class GithubDetailActivity extends SherlockActivity
 		adapter.swapCursor(c);
 		commitList.setAdapter(adapter);
 		
-		// Lazy loading of github_projects row. If it doesn't already exist, create it here.
-		String sha = null;
-		Cursor proj = db.query("github_projects", new String[] { "last_sha" },
-									"project_id="+projectId, null, null, null, null);
-		if (!proj.moveToFirst())
-		{
-			ContentValues cv = new ContentValues(1);
-			cv.put("project_id", projectId);
-			db.insert("github_projects", null, cv);
-		}
-		else
-		{
-			sha = proj.getString(proj.getColumnIndex("last_sha"));
-		}
-		proj.close();
 		db.close();
-		if (sha != null)
-		{
-			commits_url += "?sha=" + sha;
-		}
 		new FetchGithubTask().execute(commits_url);
 	}
 	
 	private class FetchGithubTask extends AsyncTask<String, Void, String>
 	{
 		private static final String TAG = "GithubDetailActivity$FetchGithubTask";
-		// For now only downloads the one project. In the future when 
-		// project locations are standardized, multiple project downloads 
-		// can be automated, even selecting by user-involved projects.
 		
 		protected String doInBackground(String... urls)
 		{
@@ -135,6 +114,14 @@ public class GithubDetailActivity extends SherlockActivity
 			SQLiteDatabase db = new GeneralOpenHelper(getApplicationContext()).getWritableDatabase();
 			try
 			{
+				Cursor c = db.query("github_commits", new String[] { "sha" },
+									null, null, null, null, null);
+				Set<String> currentShas = new HashSet<String>();
+				while (c.moveToNext())
+				{
+					currentShas.add(c.getString(c.getColumnIndex("sha")));
+				}
+				
 				JSONArray commits = new JSONArray(results);
 				for (int i = 0; i < commits.length(); i++)
 				{
@@ -142,29 +129,25 @@ public class GithubDetailActivity extends SherlockActivity
 					String name = o.getJSONObject("commit").getJSONObject("author").getString("name");
 					String date = o.getJSONObject("commit").getJSONObject("author").getString("date");
 					String message = o.getJSONObject("commit").getString("message");
+					String sha = o.getString("sha");
 					
-					ContentValues cv = new ContentValues(4);
+					ContentValues cv = new ContentValues(5);
 					cv.put("project_id", projectId);
 					cv.put("author", name);
 					cv.put("timestamp", date);
 					cv.put("message", message);
+					cv.put("sha", sha);
 					
-					// All downloaded commits are guaranteed to be new.
-					long newId = db.insert("github_commits", null, cv);
-					Log.v(TAG, "Row inserted with id " + newId);
-				}
-				// Needs to remember the newest 'sha' to store for next time.
-				if (commits.length() > 0)
-				{
-					String latest_sha = commits.getJSONObject(0).getString("sha");
-					ContentValues cv = new ContentValues(1);
-					cv.put("last_sha", latest_sha);
-					int i = db.update("github_projects", cv, "project_id="+projectId, null);
-					Log.v(TAG, i + " row(s) updated with new sha " + latest_sha);
+					if (!currentShas.contains(sha))
+					{
+						long newId = db.insert("github_commits", null, cv);
+						Log.v(TAG, "Row inserted with id " + newId);
+					}
 				}
 			
-				Cursor c = db.query("github_commits", PROJECTION, "project_id="+projectId, null, null, null, null);
-				adapter.swapCursor(c);
+				Cursor refreshList = db.query("github_commits", PROJECTION, "project_id="+projectId,
+											  null, null, null, null);
+				adapter.swapCursor(refreshList);
 			}
 			catch (JSONException e)
 			{

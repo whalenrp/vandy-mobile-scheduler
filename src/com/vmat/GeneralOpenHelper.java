@@ -16,13 +16,13 @@ public class GeneralOpenHelper extends SQLiteOpenHelper
 		  + "server_id INTEGER, team_id INTEGER, "
 		  + "created_at INTEGER, updated_at INTEGER);";
 	
-	private static final String CREATE_TABLE_GITHUB_PROJECTS = 
-			"CREATE TABLE github_projects (_id INTEGER PRIMARY KEY AUTOINCREMENT, "
-		  + "title TEXT, last_sha TEXT, project_id INTEGER);";
+//	private static final String CREATE_TABLE_GITHUB_PROJECTS = 
+//			"CREATE TABLE github_projects (_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+//		  + "title TEXT, project_id INTEGER);";
 	
 	private static final String CREATE_TABLE_GITHUB_COMMITS = 
 			"CREATE TABLE github_commits (_id INTEGER PRIMARY KEY AUTOINCREMENT, "
-		  + "project_id INTEGER, message TEXT, author TEXT, timestamp TEXT);";
+		  + "project_id INTEGER, message TEXT, author TEXT, timestamp TEXT, sha TEXT);";
 
 	public GeneralOpenHelper(Context context)
 	{
@@ -34,7 +34,7 @@ public class GeneralOpenHelper extends SQLiteOpenHelper
 	{
 		Log.v(TAG, "Creating table 'teams'");
 		db.execSQL(CREATE_TABLE_TEAMS);
-		db.execSQL(CREATE_TABLE_GITHUB_PROJECTS);
+//		db.execSQL(CREATE_TABLE_GITHUB_PROJECTS);
 		db.execSQL(CREATE_TABLE_GITHUB_COMMITS);
 	}
 

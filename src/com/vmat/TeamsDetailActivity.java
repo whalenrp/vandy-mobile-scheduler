@@ -51,7 +51,7 @@ public class TeamsDetailActivity extends SherlockActivity
 		});
     	
     	int rowId = getIntent().getIntExtra("_id", -1);
-    	SQLiteDatabase db = new TeamsOpenHelper(this).getReadableDatabase();
+    	SQLiteDatabase db = new GeneralOpenHelper(this).getReadableDatabase();
     	// Project could be more specific. Right now gets all columns.
     	Cursor c = db.query("teams", null, "_id="+rowId, null, null, null, null);
     	if (c.moveToFirst())
@@ -63,5 +63,6 @@ public class TeamsDetailActivity extends SherlockActivity
         	textDescription.setText(c.getString(c.getColumnIndex("description")));
     	}
     	c.close();
+    	db.close();
 	}
 }

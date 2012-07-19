@@ -65,7 +65,15 @@ public class MainActivity extends SherlockFragmentActivity
 			JSONObject t = new JSONObject();
 			t.put("name", "Team VandyMobile");
 			t.put("app", app);
+			JSONObject app1 = new JSONObject();
+			app1.put("id", 4873651);
+			app1.put("url", "https://api.github.com/repos/whalenrp/peopleFinder/commits");
+			app1.put("name", "peopleFinder");
+			JSONObject t1 = new JSONObject();
+			t1.put("name", "Team PeopleFinder");
+			t1.put("app", app1);
 			teams.put(t);
+			teams.put(t1);
 			o.put("username", "Tom Nguyen");
 			o.put("email", "tom@onstarterlabs.com");
 			o.put("teams", teams);

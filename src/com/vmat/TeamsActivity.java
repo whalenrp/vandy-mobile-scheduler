@@ -25,7 +25,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -49,34 +48,9 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 		
 		listView = (ListView)findViewById(R.id.list);
 		
-		//////////////////////////////////////////////////////////////////////////////
-		
-		Button gitButton = (Button)findViewById(R.id.git_button);
-		SQLiteDatabase dbtemp = new GeneralOpenHelper(getApplicationContext()).getReadableDatabase();
-		Cursor ctemp = dbtemp.query("github_projects", null, null, null, null, null, null);
-		if (!ctemp.moveToFirst())
-		{
-			ContentValues cv = new ContentValues(2);
-			cv.put("title", "vandy-mobile-scheduler");
-			cv.put("project_id", 4499644);
-			Long i = dbtemp.insert("github_projects", null, cv);
-			Log.v(TAG, "Row inserted at id " + i + " in table github_projects");
-		}
-		dbtemp.close();
-		gitButton.setOnClickListener(new View.OnClickListener() 
-		{
-			public void onClick(View v) 
-			{
-				Intent i = new Intent(TeamsActivity.this, GithubDetailActivity.class);
-				i.putExtra("project_id", 4499644);
-				startActivity(i);
-			}
-		});
-		
-		//////////////////////////////////////////////////////////////////////////////
-		
-		SQLiteDatabase db = new TeamsOpenHelper(this).getReadableDatabase();
+		SQLiteDatabase db = new GeneralOpenHelper(this).getReadableDatabase();
 		Cursor c = db.query("teams", PROJECTION, null, null, null, null, null);
+		db.close();
 		adapter = new TeamsCursorAdapter(this);
 		adapter.swapCursor(c);
 		
@@ -151,12 +125,12 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 		@Override
 		protected void onPostExecute(String result)
 		{
+			SQLiteDatabase db = new GeneralOpenHelper(TeamsActivity.this).getWritableDatabase();
 			try 
 			{
 				if (result == null)
 					return;
 				JSONArray jsonArray = new JSONArray(result);
-				SQLiteDatabase db = new TeamsOpenHelper(TeamsActivity.this).getWritableDatabase();
 				String entriesToDelete = "server_id NOT IN (-1";
 				for (int i = 0; i < jsonArray.length(); i++)
 				{
@@ -200,6 +174,10 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 			catch (JSONException e) 
 			{
 				Log.w(TAG, e.toString());
+			}
+			finally
+			{
+				db.close();
 			}
 		}
 	}

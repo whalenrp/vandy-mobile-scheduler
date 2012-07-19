@@ -6,12 +6,6 @@
     android:orientation="vertical"
     tools:ignore="HardcodedText" >
 
-    <Button
-        android:id="@+id/git_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="github" />
-
     <ListView
         android:id="@+id/list"
         android:layout_width="match_parent"

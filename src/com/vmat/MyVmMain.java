@@ -47,7 +47,7 @@ public class MyVmMain extends SherlockActivity
 		if ( !userInfo.equals("empty") ){
 			
 			startActivity(new Intent(MyVmMain.this, MyVmUserPage.class));
-			//finish();
+			finish();
 		}
 
 		// The user is not logged in, so continue making the login screen.
