@@ -86,8 +86,31 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 	@Override
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) 
 	{
-		// Launch intents based on selected tab.
-		return false;
+		// Temporary code to let me see the teams activity:
+    	String selectedTab = mTabs[itemPosition];
+    	if (selectedTab.equals("Meetings"))
+    	{
+    		Intent i = new Intent(this, MainActivity.class);
+    		startActivity(i);
+    	}
+    	else if (selectedTab.equals("Twitter"))
+    	{
+    		Intent i = new Intent(this, TwitterActivity.class);
+    		startActivity(i);
+    	}
+    	else if (selectedTab.equals("News"))
+    	{
+	    //Intent i = new Intent(this, NewsActivity.class);
+	    //	startActivity(i);
+    	}
+
+    	else if (selectedTab.equals("myVM"))
+    	{
+	    //Intent i = new Intent(this, myVMActivity.class);
+	    //	startActivity(i);
+    	}
+    	
+        return true;
 	}
 	
 	class LoadDataTask extends AsyncTask<Void, Void, String>

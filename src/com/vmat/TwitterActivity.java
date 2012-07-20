@@ -129,6 +129,17 @@ ActionBar.OnNavigationListener
     		Intent i = new Intent(this, MainActivity.class);
     		startActivity(i);
     	}
+    	else if (selectedTab.equals("News"))
+    	{
+	    //Intent i = new Intent(this, NewsActivity.class);
+	    //	startActivity(i);
+    	}
+
+    	else if (selectedTab.equals("myVM"))
+    	{
+	    //Intent i = new Intent(this, myVMActivity.class);
+	    //	startActivity(i);
+    	}
     	
         return true;
 	}	
