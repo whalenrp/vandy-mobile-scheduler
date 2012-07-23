@@ -23,19 +23,15 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="DetailActivity"
-				  android:label=""/>
-
+        <activity android:name="DetailActivity"/>
+		<activity android:name="TeamsActivity"/>
+		<activity android:name="TeamsDetailActivity"/>
+		<activity android:name="MyVmMain"/>
+		<activity android:name="MyVmUserPage"/>
+		<activity android:name="GithubDetailActivity"/>
+		<activity android:name="TwitterActivity"/>
+		
 		<service android:name="SyncService"/>
-
-		<receiver android:name=".SyncReceiver"
-				  android:exported="false"/>
-		<activity android:name="TeamsActivity"></activity>
-		<activity android:name="TeamsDetailActivity"></activity>
-	 <activity
-            android:name=".TwitterActivity"
-            android:label="@string/app_name" >
-        </activity>
-        <service android:name="SyncService"/>
-    </application>
+		<receiver android:name="SyncReceiver" android:exported="false"/>
+	</application>
 </manifest> 
