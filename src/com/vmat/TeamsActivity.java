@@ -87,7 +87,7 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) 
 	{
 		// Temporary code to let me see the teams activity:
-    	String selectedTab = mTabs[itemPosition];
+    	String selectedTab = tabs[itemPosition];
     	if (selectedTab.equals("Meetings"))
     	{
     		Intent i = new Intent(this, MainActivity.class);
