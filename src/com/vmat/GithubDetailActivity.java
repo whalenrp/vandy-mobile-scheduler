@@ -2,7 +2,9 @@ package com.vmat;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.http.client.HttpClient;
@@ -19,8 +21,10 @@ import org.json.JSONObject;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.CursorAdapter;
@@ -60,17 +64,40 @@ public class GithubDetailActivity extends SherlockActivity
 		membersText = (TextView)findViewById(R.id.text_members);
 	
 		String commits_url = "";
+		List<String> names = new ArrayList<String>();
+		List<String> emails = new ArrayList<String>();
 		try 
 		{
 			JSONObject o = new JSONObject(getIntent().getStringExtra("teamJSON"));
-			projectId = o.getJSONObject("app").getInt("id");
+			projectId = o.getJSONObject("app").getInt("github_id");
 			commits_url = o.getJSONObject("app").getString("url");
 			projectTitleText.setText(o.getJSONObject("app").getString("name"));
+			JSONArray members = o.getJSONArray("members");
+			for (int i = 0; i < members.length(); i++)
+			{
+				JSONObject j = members.getJSONObject(i);
+				names.add(j.getString("name"));
+				emails.add(j.getString("email"));
+			}
 		} 
 		catch (JSONException e) 
 		{
 			Log.e(TAG, e.toString());
-		} 
+		}
+		membersText.setText(join(names, ", "));
+		
+		final List<String> emailList = emails;
+		emailButton.setOnClickListener(new View.OnClickListener() 
+		{
+			@Override
+			public void onClick(View v) 
+			{
+				Intent i = new Intent(Intent.ACTION_VIEW);
+				Uri data = Uri.parse("mailto:" + join(emailList, ","));
+				i.setData(data);
+				startActivity(i);
+			}
+		});
 		
 		SQLiteDatabase db = new GeneralOpenHelper(this).getReadableDatabase();
 		
@@ -208,4 +235,22 @@ public class GithubDetailActivity extends SherlockActivity
         return DateFormat.format("MMM dd, yyyy h:mmaa", format.parse(tstamp));
 	}
 	
+	private String join(List<String> values, String delimiter)
+	{
+		if (values.size() == 0)
+		{
+			return "";
+		}
+		else
+		{
+			StringBuilder result = new StringBuilder();
+			result.append(values.get(0));
+			for (int i = 1; i < values.size(); i++)
+			{
+				result.append(delimiter).append(values.get(i));
+			}
+		    
+		    return result.toString();
+		}
+	}
 }

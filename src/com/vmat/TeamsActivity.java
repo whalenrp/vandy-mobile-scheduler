@@ -50,10 +50,9 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 		
 		SQLiteDatabase db = new GeneralOpenHelper(this).getReadableDatabase();
 		Cursor c = db.query("teams", PROJECTION, null, null, null, null, null);
-		db.close();
 		adapter = new TeamsCursorAdapter(this);
 		adapter.swapCursor(c);
-		
+		//db.close();
 		
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new OnItemClickListener()

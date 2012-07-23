@@ -1,0 +1,29 @@
+This text file outlines the format assumed by all myVM related classes in this project.
+
+{
+	"username" : "Tom Nguyen",
+	"email : "tom@onstarterlabs.com",
+	"teams" :
+			[
+				{
+					"name" : "Team VandyMobile",
+					"app" : 
+							{
+								"name" : "VandyMobile",
+								"github_id" : 4499644,
+								"url" : "https://api.github.com/repos/whalenrp/vandy-mobile-scheduler/commits"
+							},
+					"members" : 
+							[
+								{
+									"name" : "Patrick Widen",
+									"email" : "pwiden@eyesonly.com"
+								},
+								{
+									"name" : "Drew Burchfield",
+									"email" : "drewbie@aloompa.com"
+								}
+							]
+				}
+			],
+}

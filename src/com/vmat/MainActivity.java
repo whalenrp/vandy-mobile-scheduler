@@ -57,39 +57,34 @@ public class MainActivity extends SherlockFragmentActivity
 		JSONObject o = new JSONObject();
 		try
 		{
-			JSONObject app = new JSONObject();
-			app.put("name", "vandy-mobile-scheduler");
-			app.put("id", 4499644);
-			app.put("url", "https://api.github.com/repos/whalenrp/vandy-mobile-scheduler/commits");
-			JSONArray teams = new JSONArray();
-			JSONObject t = new JSONObject();
-			t.put("name", "Team VandyMobile");
-			t.put("app", app);
-			JSONObject app1 = new JSONObject();
-			app1.put("id", 4873651);
-			app1.put("url", "https://api.github.com/repos/whalenrp/peopleFinder/commits");
-			app1.put("name", "peopleFinder");
-			JSONObject t1 = new JSONObject();
-			t1.put("name", "Team PeopleFinder");
-			t1.put("app", app1);
-			teams.put(t);
-			teams.put(t1);
 			o.put("username", "Tom Nguyen");
 			o.put("email", "tom@onstarterlabs.com");
+			JSONArray teams = new JSONArray();
+			JSONObject teamVandyMobile = new JSONObject();
+			teamVandyMobile.put("name", "Team VandyMobile");
+			JSONObject app = new JSONObject();
+			app.put("name", "VandyMobile");
+			app.put("github_id", 4499644);
+			app.put("url", "https://api.github.com/repos/whalenrp/vandy-mobile-scheduler/commits");
+			teamVandyMobile.put("app", app);
+			JSONArray members = new JSONArray();
+			JSONObject patrick = new JSONObject();
+			patrick.put("name", "Patrick Widen");
+			patrick.put("email", "pwiden@eyesonly.com");
+			members.put(patrick);
+			JSONObject drew = new JSONObject();
+			drew.put("name", "Drew Burchfield");
+			drew.put("email", "drewbie@aloompa.com");
+			members.put(drew);
+			teamVandyMobile.put("members", members);
+			teams.put(teamVandyMobile);
 			o.put("teams", teams);
 		}
 		catch (JSONException e)
 		{
 			e.printStackTrace();
 		}
-	
-//		final String s = "{\"username\" : \"tom nguyen\" ,"
-//				+ 		  "\"email\" : \"tom@onstarterlabs.com\" ,"
-//				+         "\"teams\" : [{ \"name\" : \"Team VandyMobile\" ,"
-//				+ 						 "\"app\" : { \"name\" : \"VandyMobile\" ,"
-//    			+									 "\"id\" : 4499644 }}]}";
-		
-		
+			
 		SharedPreferences settings = getSharedPreferences("user-settings", Context.MODE_PRIVATE);
 		if (!settings.contains("userInfo"))
 		{
