@@ -78,6 +78,8 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		getSupportActionBar().setListNavigationCallbacks(navList, this);
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
+		// Avoid calling back to Meetings (at index 2 of tabs)
+		getSupportActionBar().setSelectedNavigationItem(2);
 		
 		new LoadDataTask().execute();
 	}
