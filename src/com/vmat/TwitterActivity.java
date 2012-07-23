@@ -72,7 +72,7 @@ ActionBar.OnNavigationListener
 		getSupportActionBar().setListNavigationCallbacks(list, (OnNavigationListener) this);
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		// Avoids switching back to Meetings
-		getSupportActionBar().setSelectedNavigationItem(4);
+		getSupportActionBar().setSelectedNavigationItem(1);
 	}    
 
 	@Override
@@ -121,16 +121,10 @@ ActionBar.OnNavigationListener
     		Intent i = new Intent(this, MainActivity.class);
     		startActivity(i);
     	}
-    	else if (selectedTab.equals("News"))
-    	{
-	    //Intent i = new Intent(this, NewsActivity.class);
-	    //	startActivity(i);
-    	}
-
     	else if (selectedTab.equals("myVM"))
     	{
-	    //Intent i = new Intent(this, myVMActivity.class);
-	    //	startActivity(i);
+    		Intent i = new Intent(this, MyVmMain.class);
+	    	startActivity(i);
     	}
     	
         return true;

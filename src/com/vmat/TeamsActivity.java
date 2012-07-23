@@ -95,21 +95,16 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
     		Intent i = new Intent(this, MainActivity.class);
     		startActivity(i);
     	}
-    	else if (selectedTab.equals("Twitter"))
+    	else if (selectedTab.equals("News"))
     	{
     		Intent i = new Intent(this, TwitterActivity.class);
     		startActivity(i);
     	}
-    	else if (selectedTab.equals("News"))
-    	{
-	    //Intent i = new Intent(this, NewsActivity.class);
-	    //	startActivity(i);
-    	}
 
     	else if (selectedTab.equals("myVM"))
     	{
-	    //Intent i = new Intent(this, myVMActivity.class);
-	    //	startActivity(i);
+    		Intent i = new Intent(this, MyVmMain.class);
+	    	startActivity(i);
     	}
     	
         return true;

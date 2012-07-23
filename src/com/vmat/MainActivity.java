@@ -215,23 +215,12 @@ public class MainActivity extends SherlockFragmentActivity
     		Intent i = new Intent(this, TeamsActivity.class);
     		startActivity(i);
     	}
-    	else if (selectedTab.equals("Twitter"))
+    	else if (selectedTab.equals("News"))
     	{
     		Intent i = new Intent(this, TwitterActivity.class);
     		startActivity(i);
     	}
-    	else if (selectedTab.equals("News"))
-    	{
-	    //Intent i = new Intent(this, NewsActivity.class);
-	    //	startActivity(i);
-    	}
-
-    	else if (selectedTab.equals("myVM"))
-    	{
-	    //Intent i = new Intent(this, myVMActivity.class);
-	    //	startActivity(i);
-    	}
-    	if ( selectedTab.equals("myVM") )
+    	else if ( selectedTab.equals("myVM") )
     	{
     		Intent i = new Intent(this, MyVmMain.class);
     		startActivity(i);
