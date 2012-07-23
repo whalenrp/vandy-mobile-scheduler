@@ -20,6 +20,8 @@ import android.net.Uri;
 import android.util.Log;
 
 public class SyncService extends IntentService{
+	private static final String TAG = "SyncService";
+	
 	static final int TWITTER_SYNC = 0;
 	static final int MEETING_SYNC = 1;
 	static final String TWITTER_URI = "content://com.vmat/twitter/0";
@@ -46,14 +48,18 @@ public class SyncService extends IntentService{
 				try{
 					url = new URL(twitterString);
 					conn = (HttpURLConnection)url.openConnection();
+					Log.v(TAG, "response status: " + conn.getResponseCode() + " " + conn.getResponseMessage());
 					syncTwitterDB();
-					conn.disconnect();
 				}catch(MalformedURLException e){
 					Log.w("SyncService", "Twitter URL is no longer valid.");
 					e.printStackTrace();
 				}catch(IOException e){
 					Log.w("SyncService", "Twitter connection could not be established.");
 					e.printStackTrace();
+				}
+				finally
+				{
+					conn.disconnect();
 				}
 				break;
 			case MEETING_SYNC:

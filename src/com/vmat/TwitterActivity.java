@@ -1,27 +1,17 @@
 package com.vmat;
 
 
-import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.CursorAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.widget.SimpleCursorAdapter;
+import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.support.v4.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
@@ -81,6 +71,8 @@ ActionBar.OnNavigationListener
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		getSupportActionBar().setListNavigationCallbacks(list, (OnNavigationListener) this);
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
+		// Avoids switching back to Meetings
+		getSupportActionBar().setSelectedNavigationItem(4);
 	}    
 
 	@Override
