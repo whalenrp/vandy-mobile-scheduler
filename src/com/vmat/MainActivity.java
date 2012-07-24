@@ -52,50 +52,6 @@ public class MainActivity extends SherlockFragmentActivity
 
 		setContentView(R.layout.main);
 		
-		//////////////////////////////////////////////////////
-		
-		JSONObject o = new JSONObject();
-		try
-		{
-			o.put("username", "Tom Nguyen");
-			o.put("email", "tom@onstarterlabs.com");
-			JSONArray teams = new JSONArray();
-			JSONObject teamVandyMobile = new JSONObject();
-			teamVandyMobile.put("name", "Team VandyMobile");
-			JSONObject app = new JSONObject();
-			app.put("name", "VandyMobile");
-			app.put("github_id", 4499644);
-			app.put("url", "https://api.github.com/repos/whalenrp/vandy-mobile-scheduler/commits");
-			teamVandyMobile.put("app", app);
-			JSONArray members = new JSONArray();
-			JSONObject patrick = new JSONObject();
-			patrick.put("name", "Patrick Widen");
-			patrick.put("email", "pwiden@eyesonly.com");
-			members.put(patrick);
-			JSONObject drew = new JSONObject();
-			drew.put("name", "Drew Burchfield");
-			drew.put("email", "drewbie@aloompa.com");
-			members.put(drew);
-			teamVandyMobile.put("members", members);
-			teams.put(teamVandyMobile);
-			o.put("teams", teams);
-		}
-		catch (JSONException e)
-		{
-			e.printStackTrace();
-		}
-			
-		SharedPreferences settings = getSharedPreferences("user-settings", Context.MODE_PRIVATE);
-		if (!settings.contains("userInfo"))
-		{
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putString("userInfo", o.toString());
-			editor.commit();
-			Log.v("MainActivity", "Commiting userInfo: " + o.toString());
-		}
-		
-		//////////////////////////////////////////////////////
-		
 		db = new EventsDB(this);
 
 		mAdapter = new EventsCursorAdapter();

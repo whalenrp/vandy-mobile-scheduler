@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -39,6 +40,8 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 	private String[] tabs;
 	private CursorAdapter adapter;
 	
+	private boolean isFirstLoad;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
@@ -50,6 +53,7 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 		
 		SQLiteDatabase db = new GeneralOpenHelper(this).getReadableDatabase();
 		Cursor c = db.query("teams", PROJECTION, null, null, null, null, null);
+		isFirstLoad = !(c.getCount() > 0);
 		adapter = new TeamsCursorAdapter(this);
 		adapter.swapCursor(c);
 		//db.close();
@@ -114,6 +118,18 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 	{
 		private static final String TAG = "TeamsActivity$LoadDataTask";
 		private static final String TEAMS_URL = "http://70.138.50.84/apps.json";
+		
+		ProgressDialog dialog;
+		
+		protected void onPreExecute()
+		{
+			if (isFirstLoad)
+			{
+				dialog = new ProgressDialog(TeamsActivity.this);
+				dialog.setMessage("Loading...");
+				dialog.show();
+			}
+		}
 		
 		@Override
 		protected String doInBackground(Void... voids) 
@@ -197,6 +213,10 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 			finally
 			{
 				db.close();
+				if (isFirstLoad)
+				{
+					dialog.dismiss();
+				}
 			}
 		}
 	}

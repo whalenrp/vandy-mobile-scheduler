@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="match_parent" 
     tools:ignore="HardcodedText" >
 
     <TextView
@@ -14,7 +14,7 @@
         android:paddingLeft="10dip"
         android:paddingTop="5dip"
         android:text="(Commit Message)"
-        android:textColorHint="@android:color/black"
+        android:textColor="@android:color/black"
         android:textSize="15dip"
         android:textStyle="bold" />
 
@@ -26,7 +26,7 @@
         android:layout_below="@+id/text_commit_title"
         android:paddingLeft="10dip"
         android:text="(author)"
-        android:textColorHint="@android:color/black" />
+        android:textColor="@android:color/black" />
 
     <TextView
         android:id="@+id/text_commit_timestamp"
