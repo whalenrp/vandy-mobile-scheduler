@@ -1,23 +1,30 @@
 package com.vmat;
 
+import java.io.ByteArrayOutputStream;
+import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.CursorAdapter;
@@ -33,8 +40,8 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 public class TeamsActivity extends SherlockFragmentActivity implements ActionBar.OnNavigationListener
 {
-	private static final String TAG = "TeamsActivity";
-	private static final String[] PROJECTION = new String[] { "_id", "name", "tagline" };
+//	private static final String TAG = "TeamsActivity";
+	private static final String[] PROJECTION = new String[] { "_id", "name", "tagline", "app_icon" };
 	
 	private ListView listView;
 	private String[] tabs;
@@ -56,7 +63,7 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 		isFirstLoad = !(c.getCount() > 0);
 		adapter = new TeamsCursorAdapter(this);
 		adapter.swapCursor(c);
-		//db.close();
+		db.close();
 		
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new OnItemClickListener()
@@ -114,12 +121,13 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
         return true;
 	}
 	
-	class LoadDataTask extends AsyncTask<Void, Void, String>
+	class LoadDataTask extends AsyncTask<Void, Void, Void>
 	{
 		private static final String TAG = "TeamsActivity$LoadDataTask";
-		private static final String TEAMS_URL = "http://70.138.50.84/apps.json";
+		private static final String TEAMS_URL = "http://vandymobile.com/apps.json";
 		
-		ProgressDialog dialog;
+		private ProgressDialog dialog;
+		private SQLiteDatabase db = new GeneralOpenHelper(TeamsActivity.this).getWritableDatabase();
 		
 		protected void onPreExecute()
 		{
@@ -132,39 +140,18 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 		}
 		
 		@Override
-		protected String doInBackground(Void... voids) 
+		@SuppressWarnings("unchecked")
+		protected Void doInBackground(Void... voids) 
 		{
+			
 			HttpClient httpClient = new DefaultHttpClient();
 			try
-			{
-		        final HttpParams params = httpClient.getParams();
-		        HttpConnectionParams.setConnectionTimeout(params, 30 * 1000);
-		        HttpConnectionParams.setSoTimeout(params, 30 * 1000);
-		        ConnManagerParams.setTimeout(params, 30 * 1000);
-		        
+			{      
 		        final HttpGet httpget = new HttpGet(TEAMS_URL);
 				ResponseHandler<String> responseHandler = new BasicResponseHandler();
-				return httpClient.execute(httpget, responseHandler);
-			}
-			catch (Exception e)
-			{
-				Log.w(TAG, e.toString());
-			}
-			finally
-			{
-				httpClient.getConnectionManager().shutdown();
-			}
-			return null;
-		}
-		
-		@Override
-		protected void onPostExecute(String result)
-		{
-			SQLiteDatabase db = new GeneralOpenHelper(TeamsActivity.this).getWritableDatabase();
-			try 
-			{
-				if (result == null)
-					return;
+				String result =  httpClient.execute(httpget, responseHandler);
+				
+				Map<Integer, String> imageLinks = new HashMap<Integer, String>();
 				JSONArray jsonArray = new JSONArray(result);
 				String entriesToDelete = "server_id NOT IN (-1";
 				for (int i = 0; i < jsonArray.length(); i++)
@@ -198,26 +185,79 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 						Log.v(TAG, insertions + " row(s) inserted.");
 					}
 					
+					imageLinks.put(o.getInt("id"), o.getString("image_url"));
 					c.close();
 				}
 				
 				entriesToDelete += ")";
 				Log.v(TAG, "deleting: " + entriesToDelete);
 				db.delete("teams", entriesToDelete, null);
-				adapter.swapCursor(db.query("teams", PROJECTION, null, null, null, null, null));
-			} 
-			catch (JSONException e) 
+				new FetchImageTask().execute(imageLinks);
+			}
+			catch (Exception e)
 			{
 				Log.w(TAG, e.toString());
+				e.printStackTrace();
 			}
 			finally
 			{
-				db.close();
-				if (isFirstLoad)
-				{
-					dialog.dismiss();
-				}
+				httpClient.getConnectionManager().shutdown();
+			}
+			return null;
+		}
+		
+		protected void onPostExectute(Void v)
+		{
+			adapter.swapCursor(db.query("teams", PROJECTION, null, null, null, null, null));
+			db.close();
+			if (isFirstLoad && dialog.isShowing())
+			{
+				dialog.dismiss();
 			}
 		}
+	}
+	
+	private class FetchImageTask extends AsyncTask<Map<Integer, String>, Void, Void>
+	{
+		private static final String TAG = "TeamsActivity$FetchImageTask";
+		private SQLiteDatabase db = new GeneralOpenHelper(TeamsActivity.this).getWritableDatabase();
+		
+		@Override
+		protected Void doInBackground(Map<Integer, String>... params) 
+		{
+			Map<Integer, String> images = params[0];
+			Set<Integer> keys = images.keySet();
+			for (Integer k : keys)
+			{
+				try
+				{
+					URL url = new URL(images.get(k));
+					HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+					Bitmap b = BitmapFactory.decodeStream(conn.getInputStream());
+					
+					ByteArrayOutputStream stream = new ByteArrayOutputStream();
+					b.compress(Bitmap.CompressFormat.PNG, 100, stream);
+					byte[] byteArray = stream.toByteArray();
+					
+					ContentValues cv = new ContentValues(1);
+					cv.put("app_icon", byteArray);
+					int i = db.update("teams", cv, "server_id"+"="+k, null);
+					Log.v(TAG, "placed icon for " + i + " item(s)");
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			
+			return null;
+		}
+		
+		protected void onPostExecute(Void v)
+		{
+			adapter.swapCursor(db.query("teams", PROJECTION, null, null, null, null, null));
+			db.close();
+		}
+		
 	}
 }

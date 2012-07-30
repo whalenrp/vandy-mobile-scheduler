@@ -3,4 +3,5 @@
     <string name="app_name">MobileMeetups</string>
     <color name="headerColor">#e3ae21</color>
     <color name="white">#dedddb</color>
+    <color name="backgroundColor">#eddfb2</color>
 </resources>

@@ -14,11 +14,12 @@ public class GeneralOpenHelper extends SQLiteOpenHelper
 			"CREATE TABLE teams (_id INTEGER PRIMARY KEY AUTOINCREMENT, "
 		  + "name TEXT, team TEXT, os TEXT, tagline TEXT, description TEXT, "
 		  + "server_id INTEGER, team_id INTEGER, "
-		  + "created_at INTEGER, updated_at INTEGER);";
+		  + "created_at INTEGER, updated_at INTEGER, app_icon BLOB);";
 	
 //	private static final String CREATE_TABLE_GITHUB_PROJECTS = 
 //			"CREATE TABLE github_projects (_id INTEGER PRIMARY KEY AUTOINCREMENT, "
 //		  + "title TEXT, project_id INTEGER);";
+	
 	
 	private static final String CREATE_TABLE_GITHUB_COMMITS = 
 			"CREATE TABLE github_commits (_id INTEGER PRIMARY KEY AUTOINCREMENT, "

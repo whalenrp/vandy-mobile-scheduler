@@ -1,6 +1,7 @@
 package com.vmat;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -13,10 +14,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.IntentService;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.util.Log;
 
 public class SyncService extends IntentService{
@@ -30,7 +35,7 @@ public class SyncService extends IntentService{
 	private Uri meetingURI;
 	private URL url = null;
 	private HttpURLConnection conn = null;
-	private String meetingString = "http://70.138.50.84/meetings.json";
+	private String meetingString = "http://vandymobile.com/meetings.json";
 	private String twitterString = "http://api.twitter.com/1/statuses/user_timeline.json?screen_name=VandyMobile&include_rts=1";
 
 	public SyncService(){
@@ -83,71 +88,54 @@ public class SyncService extends IntentService{
 		}
 	}
 
-	private void syncTwitterDB(){
-	    String jsonString = "";
-	InputStream in = null;
-	try{
-		Log.i("SyncService","PreStream");
-	    in = new BufferedInputStream(conn.getInputStream());
-
-		Log.i("SyncService","GotStream");
-	}
-	catch(IOException e){
-	    e.printStackTrace();
-	    return;
-	}
-	
-	jsonString = convertStreamToString(in);
-	Log.i("SyncService","Converted To String");
-	if (jsonString.length() == 0) 
-	    return;
-	
-	JSONArray jsonArray = null;
-	try{
-	    jsonArray = new JSONArray(jsonString);
-	}catch(JSONException e){
-	    e.printStackTrace();
-	}
-	Log.i("SyncService","Created null JSON Array");
-	TwitterDB twitterdb = new TwitterDB(this);
-	Log.i("SyncService","Created null a TwitterDB");
-	//db.getWritableDatabase().delete(EventsDB.TABLE_NAME, null, null);
-
-	Log.i("SyncService","About to call get Writeable DB: ");//+ jsonArray.length() );
-	SQLiteDatabase  mDB = twitterdb.getWritableDatabase();
-
-	String[] columns = {TwitterDB.TEXT};
-	try{
-	    for (int i = 0; i < jsonArray.length(); ++i){
-
-	    Log.i("SyncService","Called: " + i + " times");
-		JSONObject object =  jsonArray.getJSONObject(i);
-		//checking db so there are no repeats.
-		
-		
-		String text = object.getString(TwitterDB.TEXT);
-		Cursor mCursor = mDB.query(TwitterDB.TABLE_NAME, columns, 
-				   TwitterDB.TEXT + "=?",
-				   new String[]{text},
-				   null, null, null, "1");
-		
-		if(mCursor.getCount()==0)
-		{
-			twitterdb.insert(object.getString(TwitterDB.CREATED_AT), 
-				 object.getString(TwitterDB.TEXT));
-			Log.i("SyncService", "Inserted new entry");
+	private void syncTwitterDB()
+	{
+		JSONArray jsonArray = null;
+	    try
+	    {
+	    	jsonArray = new JSONArray(convertStreamToString(conn.getInputStream()));
+	    	Log.v(TAG, "Got twitter data: " + jsonArray.toString());
 	    }
+	    catch(Exception e)
+	    {
+	    	e.printStackTrace();
+	    	return;
 	    }
-	}
-	    catch(JSONException e){
+	
+	    SQLiteDatabase  db = new TwitterDB(this).getWritableDatabase();
+	    Cursor mCursor = null;
+	    try
+	    {
+	    	for (int i = 0; i < jsonArray.length(); ++i)
+	    	{
+	    		JSONObject o =  jsonArray.getJSONObject(i);
+	    		//checking db so there are no repeats.
+	    		String text = o.getString(TwitterDB.TEXT);
+	    		mCursor = db.query(TwitterDB.TABLE_NAME, new String[] {TwitterDB.TEXT}, 
+	    								   TwitterDB.TEXT+"=?", new String[] { text },
+	    								   null, null, null, "1");
+	    		if(mCursor.getCount()==0)
+	    		{
+	    			ContentValues cv = new ContentValues(2);
+					cv.put(TwitterDB.CREATED_AT, o.getString(TwitterDB.CREATED_AT));
+					cv.put(TwitterDB.TEXT, o.getString(TwitterDB.TEXT));
+					long insertedItem = db.insert(TwitterDB.TABLE_NAME, null, cv);
+					Log.v(TAG, "Inserted twitter item with id: " + insertedItem);
+	    		}
+	    	}
+	    	getContentResolver().notifyChange(twitterURI, null);
+	    }
+	    catch (JSONException e)
+	    {
 	    	e.printStackTrace();
 	    }
-	getContentResolver().notifyChange(twitterURI, null);
-	twitterdb.close();
-	Log.i("SyncService", "Database Refreshed");
+	    finally
+	    {
+	    	mCursor.close();
+	    	db.close();
+	    }
     }
 	
-
 	private void syncMeetingDB(){
 
 		// Read in response as one string

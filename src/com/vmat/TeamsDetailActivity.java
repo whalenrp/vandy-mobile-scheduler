@@ -5,6 +5,8 @@ import com.actionbarsherlock.app.SherlockActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,9 +32,9 @@ public class TeamsDetailActivity extends SherlockActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.teams_detail_activity);
         
-        Drawable icon = getResources().getDrawable(R.drawable.ic_jog_dial_answer);
+//        Drawable icon = getResources().getDrawable(R.drawable.ic_jog_dial_answer);
         appIcon = (ImageView)findViewById(R.id.img_app_icon);
-        appIcon.setImageDrawable(icon);
+//        appIcon.setImageDrawable(icon);
         textTitle = (TextView)findViewById(R.id.text_title);
     	textTagline = (TextView)findViewById(R.id.text_tagline);
     	textOs = (TextView)findViewById(R.id.text_os);
@@ -61,6 +63,13 @@ public class TeamsDetailActivity extends SherlockActivity
         	textOs.setText(c.getString(c.getColumnIndex("os")));
         	textTeam.setText(c.getString(c.getColumnIndex("team")));
         	textDescription.setText(c.getString(c.getColumnIndex("description")));
+      
+        	byte[] imageData = c.getBlob(c.getColumnIndex("app_icon"));
+    		if (imageData != null)
+    		{
+    			Bitmap b = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+    			appIcon.setImageBitmap(b);
+    		}
     	}
     	c.close();
     	db.close();

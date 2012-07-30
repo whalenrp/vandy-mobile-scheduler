@@ -1,16 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_height="48dp"
-        android:layout_width="match_parent"
-        android:paddingBottom="5dp"
-		android:paddingLeft="5dp"
-        android:orientation="vertical">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="5dp"
+    android:paddingLeft="5dp"
+    tools:ignore="HardcodedText" >
+
+    <ImageView
+        android:id="@+id/profile_image_view"
+        android:layout_width="70dip"
+        android:layout_height="70dip"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:contentDescription="profile pic"
+        android:paddingLeft="5dip"
+        android:paddingRight="5dip"
+        android:paddingTop="10dip"
+        android:src="@drawable/twitter_profile_image" />
+
     <TextView
-            android:id="@+id/text"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:textSize="18sp"
-            android:textStyle="bold"
-			android:ellipsize="end"
-            android:singleLine="false"/>
-</LinearLayout>
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/profile_image_view"
+        android:ellipsize="end"
+        android:paddingTop="10dip"
+        android:singleLine="false"
+        android:text="(tweet goes here)"
+        android:textSize="12sp" />
+
+</RelativeLayout>

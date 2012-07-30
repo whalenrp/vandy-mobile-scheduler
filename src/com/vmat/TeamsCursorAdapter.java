@@ -2,6 +2,8 @@ package com.vmat;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
@@ -24,9 +26,16 @@ public class TeamsCursorAdapter extends CursorAdapter
 		TextView titleText = (TextView)view.findViewById(R.id.text_app_title);
 		TextView taglineText = (TextView)view.findViewById(R.id.text_app_tagline);
 		
+		byte[] imageData = cursor.getBlob(cursor.getColumnIndex("app_icon"));
+		if (imageData != null)
+		{
+			Bitmap b = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+			appIcon.setImageBitmap(b);
+		}
+		
 		// temporary fix until icons are added to server data
-		Drawable icon = context.getResources().getDrawable(R.drawable.ic_dialog_alert_holo_light);
-		appIcon.setImageDrawable(icon);
+//		Drawable icon = context.getResources().getDrawable(R.drawable.ic_dialog_alert_holo_light);
+//		appIcon.setImageDrawable(icon);
 		
 		titleText.setText(cursor.getString(cursor.getColumnIndex("name")));
 		taglineText.setText(cursor.getString(cursor.getColumnIndex("tagline")));

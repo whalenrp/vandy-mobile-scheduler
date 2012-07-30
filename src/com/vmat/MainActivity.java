@@ -224,8 +224,8 @@ public class MainActivity extends SherlockFragmentActivity
                 e.printStackTrace();
             }
 
-			// ex - Wednesday, January 10 @ 7:30 PM
-            holder.date.setText(DateFormat.format("EEEE, MMMM d '@' h:mm a", parsed));
+			// ex - Wed, Jan 10 @ 7:30 PM
+            holder.date.setText(DateFormat.format("EE, MMM d 'at' h:mm a", parsed));
         }
     }
 }

@@ -1,26 +1,27 @@
 package com.vmat;
 
-
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.support.v4.widget.SimpleCursorAdapter;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
-public class TwitterActivity extends SherlockFragmentActivity  implements LoaderManager.LoaderCallbacks<Cursor>,
-ActionBar.OnNavigationListener
+public class TwitterActivity extends SherlockFragmentActivity  
+							 implements LoaderManager.LoaderCallbacks<Cursor>, ActionBar.OnNavigationListener
 {
-    private SimpleCursorAdapter tAdapter = null;
+	private static final String TAG = "TwitterActivity";
+	private static final String[] PROJECTION = new String[] {TwitterDB.ID, TwitterDB.TEXT};
+    private CursorAdapter tAdapter = null;
     private TwitterDB db = null;
     private String[] mTabs = null;
     private ListView tweets = null;
@@ -32,31 +33,23 @@ ActionBar.OnNavigationListener
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.twitter);
 	    
-	    Log.i("TwitterTwoActivity", "Reached this Point: 1");
 	    db = new TwitterDB(this);
-	    String[] columns = new String[1];
-	    columns[0] = TwitterDB.TEXT;
-	    Log.i("TwitterTwoActivity", "Reached this Point: 2");
-	    int [] to = new int[1];
-	    TextView myView = null;
-	    to[0] = R.id.text;
-	  //  Cursor cursor = db.getReadableDatabase().query(TwitterDB.TABLE_NAME, columns, null, null, null, null, TwitterDB.DEFAULT_ORDER);
-	    tAdapter = new SimpleCursorAdapter(this, R.layout.twitterrowlayout, null, columns, to, 0); 
-	    Log.i("TwitterTwoActivity", "Reached this Point: 3");
+	    
+	    SQLiteDatabase sqliteDB =  db.getReadableDatabase();
+	    Cursor c = sqliteDB.query(TwitterDB.TABLE_NAME, PROJECTION, null, null, null, null, null);
+	    
 	    tweets = (ListView) findViewById(R.id.listtwitter);
+	    tAdapter = new TwitterCursorAdapter(this);
+	    tAdapter.swapCursor(c);
+	    
 	    tweets.setAdapter(tAdapter);
-	    
+	    	    
 	    absInit();
-	    
-	    Log.i("TwitterTwoActivity", "Reached this Point: 4");
-
 	   
 	    Intent intent = new Intent(this, SyncService.class);
 		intent.putExtra("action", SyncService.TWITTER_SYNC);
 		this.startService(intent);
-		
-
-	    Log.i("TwitterTwoActivity", "Reached this Point: 5");
+	
 	    getSupportLoaderManager().initLoader(0, null, (android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor>) this);
 	}
 
@@ -78,12 +71,12 @@ ActionBar.OnNavigationListener
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 
-		Log.i("TwitterTwoAcitivity TwitterTwoActivity TwitterTwoActivity", "Starting Load in background");
+		Log.i("TwitterActivity", "Starting Load in background");
 		return new DBCursorLoader(this, 
 				SyncService.TWITTER_URI,
 				db, // SQLiteOpenHelper
 				TwitterDB.TABLE_NAME, // Table name
-				new String[] {TwitterDB.ID, TwitterDB.TEXT}, // columns
+				PROJECTION, // columns
 				null, // selection
 				null, // selectionArgs
 				null, // groupBy
@@ -95,8 +88,7 @@ ActionBar.OnNavigationListener
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor curCursor) {
-		Log.i("TwitterTwoAcitivity", "LOOK AT ME NOW");
-		Log.i("TwitterTwoAcitivity", ""+curCursor.getCount());
+		Log.i("TwitterTwoAcitivity", "cursor count: "+curCursor.getCount());
 		tAdapter.swapCursor(curCursor);
 	//	tAdapter.bindView(findViewById(R.id.text), this, curCursor);
 		
