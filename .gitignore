@@ -3,9 +3,8 @@
 bin/*
 gen/*
 out/*
-build.xml
 project.properties
-
+local.properties
 
 # Compiled source #
 ###################
