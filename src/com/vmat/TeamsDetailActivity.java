@@ -1,19 +1,18 @@
 package com.vmat;
 
-import com.actionbarsherlock.app.SherlockActivity;
-
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.actionbarsherlock.app.SherlockActivity;
 
 public class TeamsDetailActivity extends SherlockActivity
 {
@@ -32,9 +31,7 @@ public class TeamsDetailActivity extends SherlockActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.teams_detail_activity);
         
-//        Drawable icon = getResources().getDrawable(R.drawable.ic_jog_dial_answer);
         appIcon = (ImageView)findViewById(R.id.img_app_icon);
-//        appIcon.setImageDrawable(icon);
         textTitle = (TextView)findViewById(R.id.text_title);
     	textTagline = (TextView)findViewById(R.id.text_tagline);
     	textOs = (TextView)findViewById(R.id.text_os);

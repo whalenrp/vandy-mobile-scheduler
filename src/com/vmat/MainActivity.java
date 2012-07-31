@@ -4,16 +4,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -32,13 +26,12 @@ import android.widget.ListView;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
-
 public class MainActivity extends SherlockFragmentActivity 
 	implements LoaderManager.LoaderCallbacks<Cursor>,
 	ActionBar.OnNavigationListener
 {
 	private EventsCursorAdapter mAdapter = null;
-	private ProgressDialog progress = null;
+//	private ProgressDialog progress = null;
 	private EventsDB db = null;
 	private String[] mTabs = null;
 	private ListView meetings = null;
@@ -66,7 +59,7 @@ public class MainActivity extends SherlockFragmentActivity
 		// the local DB.
 		meetings.setOnItemClickListener(new OnItemClickListener(){
 			@Override
-			public void onItemClick(AdapterView parent, View v, int pos, long id){
+			public void onItemClick(AdapterView<?> parent, View v, int pos, long id){
 				Intent intent = new Intent(MainActivity.this, DetailActivity.class);
 
 				Cursor tempCursor = mAdapter.getCursor();

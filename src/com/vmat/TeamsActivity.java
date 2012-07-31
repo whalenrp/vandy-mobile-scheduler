@@ -1,7 +1,6 @@
 package com.vmat;
 
 import java.io.ByteArrayOutputStream;
-import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -141,6 +140,7 @@ public class TeamsActivity extends SherlockFragmentActivity implements ActionBar
 		
 		@Override
 		@SuppressWarnings("unchecked")
+		@SuppressLint("UseSparseArrays")
 		protected Void doInBackground(Void... voids) 
 		{
 			
